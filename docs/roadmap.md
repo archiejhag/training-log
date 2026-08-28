@@ -1,0 +1,152 @@
+# Training Log — where it goes next
+
+A phased plan for evolving the app. This is a **sequence**, not a backlog: it
+hardens the core loop before widening the surface, and it puts the feature that
+actually makes the app different (the adaptive layer) after there's real data to
+make it honest.
+
+> A styled version of this roadmap lives here:
+> <https://claude.ai/code/artifact/94b7d7fe-5a1e-41e1-bc69-27ce73f9325a>
+
+Where the app is today: a two-second daily mark (Trained / Skipped / Rest), an
+optional exercise log behind it, and a weekly strip that counts **marks, not
+streaks**. It persists to `localStorage` and looks like chalk on slate.
+
+---
+
+## The line we don't cross
+
+This is the design thesis. Every idea below is subordinate to it. If a feature
+needs one of these to work, the feature is wrong.
+
+- **No streaks.** No "7 days in a row". No consecutive-day count anywhere, ever.
+- **No guilt notifications.** One opt-in, gentle daily reminder is the ceiling.
+- **No effort grading.** "Only 20 minutes" is never judged or downweighted.
+- **No comparison to other people.** No leaderboards, no percentiles.
+- **The exercise log stays optional.** A drop in logging is information, not failure.
+
+## How to judge a new idea
+
+Run any feature — including the ones below — through these four:
+
+1. Does it keep a **busy week** and a **failed week** visibly different?
+2. Does it add **any friction** to the two-second daily mark?
+3. Would it still make sense for someone who opens the app **once a week**?
+4. Does it help you **restart**, or does it only measure?
+
+Keep it if it passes 1, 3, 4 and fails 2. Anything that adds friction to the
+daily mark goes elsewhere in the flow, or gets cut.
+
+---
+
+**Effort key:** `S` = an evening · `M` = a weekend · `L` = a few weekends.
+Tags below are `[impact · effort]`.
+
+## Phase 0 — Make the core loop unbreakable
+
+Everything after this assumes the daily mark and the weekly strip already work
+without thinking, on the device you actually carry. Nothing new until this is true.
+
+- **Edit past days from the strip** `[High · M]` — tap any day to set or change
+  its mark. Today-only marking quietly contradicts "a missed day isn't game over".
+- **"Catch up yesterday" prompt** `[High · S]` — on open, if yesterday is blank,
+  one dismissible line with the three tier buttons inline. Offered once, then gone.
+- **Real-device layout** `[High · S]` — drop the 420px phone frame on phones, go
+  full-bleed, honour safe-area insets, bump tap targets.
+- **Installable & offline (PWA)** `[Med · M]` — manifest, icon, service worker
+  caching the shell. Add to home screen; works with no signal.
+- **Accessibility pass** `[Med · S]` — tiers as a keyboard radiogroup,
+  `aria-checked`, visible focus rings, `prefers-reduced-motion`.
+- **Unit tests for the pure logic** `[Med · S]` — `weekKeys`, `dayLetter`, and the
+  `useTrainingLog` reducer are pure functions. Vitest, one afternoon.
+- **Deploy + live link** `[High · S]` — Netlify or Vercel; static host of the
+  build output. A demo link beats a repo alone in an interview.
+- **Export / import JSON** `[Low · S]` — own your data, and get the first Settings
+  surface for free.
+
+## Phase 1 — A visual identity people remember
+
+The weekly strip is the signature object. Make it unmistakably yours, and carry
+that voice into every corner of the app.
+
+- **Actual chalk strokes** `[High · M]` — SVG turbulence + displacement filter to
+  roughen stroke edges, slight per-stroke rotation jitter, dust at the ends.
+- **Draw-on & erase motion** `[Med · M]` — stroke grows from the baseline when you
+  mark a day; eraser-swipe when you clear. Gated behind `prefers-reduced-motion`.
+- **Board furniture** `[Med · M]` — a wooden tray with a chalk nub and an eraser;
+  the eraser *is* the clear / undo control.
+- **Colour that isn't hue-only** `[Med · S]` — give the three tiers a texture too
+  (solid / dashed / dotted) so state survives colour-blindness and a dim screen.
+- **A voice pass** `[High · S]` — write every empty state, first-launch screen, and
+  long-gap message in the app's warm, non-judgmental register.
+- **Monthly board view** `[Med · M]` — a term's worth of tiny strokes in a grid.
+  Still no streak highlighting.
+- **Optional "whiteboard" light theme** `[Low · S]` — the token structure already
+  exists; invert it, expose a toggle in Settings.
+
+## Phase 2 — Depth in the log, without weight
+
+Only once the daily mark is a genuine habit. Every item here is opt-in and
+reversible — the log must never start to feel mandatory.
+
+- **Recent-exercise autocomplete** `[High · S]` — suggest names you've typed
+  before. Kills most of the keyboard time, which is most of the friction.
+- **"Repeat last session"** `[High · S]` — one tap clones the previous Trained
+  day's exercise list, ready to adjust.
+- **Session-type tag** `[Med · S]` — one optional tap: Push / Pull / Legs / Cardio
+  / Mobility. Cheap now, and the raw material Phase 3 needs.
+- **Per-day note line** `[Med · S]` — one freeform line on any day, any tier
+  ("tweaked knee", "travelling"). Works for Rest and Skipped too.
+- **Progressive per-set detail** `[Low · M]` — default stays the single
+  sets×reps×weight line; a "+ per-set" expands only on the days you care.
+- **Freeform "what I did"** `[Med · S]` — a plain textarea as an alternative to
+  structured rows. Some days you just type "8k run, felt good".
+
+## Phase 3 — The adaptive layer
+
+This is what makes the app different from every streak tracker. It needs a few
+weeks of real marks and skip-reasons to say anything true — which is why it comes
+this late.
+
+- **Set your bar** `[High · M]` — a weekly intention ("three sessions feels
+  right"). The weekly view measures against *your* number, not 7.
+- **Busy-stretch detection → lower the bar** `[High · M]` — when skips cluster, the
+  app offers to drop the bar to 2 *before* you give up, not after. Always an offer.
+- **Skip-reason patterns, surfaced gently** `[High · M]` — "Three 'Busy' skips in
+  the last ten days. Weeks like this, two sessions is a win." Dismissible, never
+  prescriptive. This is why the reason chips exist.
+- **Re-entry acknowledgement** `[Med · S]` — after a gap, the next mark gets a
+  quiet "Back in — that's the hard part."
+- **"Gaps are normal" view** `[Med · M]` — a 30–90 day view framed as evidence
+  that things dip and recover. Not a scoreboard.
+- **Richer reason taxonomy** `[Low · S]` — add "Injured / unwell", "Unplanned
+  rest", a custom option. Still one tap.
+
+## Phase 4 — Platform & portfolio weight
+
+Last, because it's infrastructure, not product. Do it when this is an app you
+actually open every day.
+
+- **Supabase sync + auth, offline-first** `[Med · L]` — `localStorage` stays the
+  cache; Supabase is the source of truth across devices. Good interview surface:
+  row-level security, migrations, conflict handling.
+- **Settings screen** `[Med · S]` — week-start day, weekly bar, theme, export,
+  clear-all.
+- **CI + a performance budget** `[Low · S]` — tests and lint on every push; a
+  Lighthouse / PWA check that fails the build if the shell gets heavy.
+- **Write the case study** `[High · S]` — the one-paragraph pitch, two screenshots,
+  and the "no streaks, no ranked tiers" decision written up.
+
+---
+
+## Right now
+
+1. **Deploy it** and put the live link in the README.
+2. **Edit past days** from the strip — close the gap in the core promise.
+3. **The catch-up-yesterday prompt** — the smallest thing that makes a missed day
+   recoverable.
+
+Everything else waits behind these three.
+
+*Living document — reorder freely within a phase. The only fixed part is "the
+line we don't cross".*

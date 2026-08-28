@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Log — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2A2D2B;
+    --panel: #33362F;
+    --panel-raised: #3B3E36;
+    --chalk: #EDECE6;
+    --chalk-dim: #A6A9A0;
+    --amber: #C99A4A;
+    --skip: #7C8B93;
+    --rest: #8FA089;
+    --hairline: rgba(237,236,230,0.10);
+    --hairline-strong: rgba(237,236,230,0.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px;
+    background: #1c1e1c;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .phone-frame {
+    width: 390px;
+    max-width: 100%;
+    background: var(--bg);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+    position: relative;
+  }
+
+  .phone-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image:
+      radial-gradient(circle at 20% 30%, #fff 0.5px, transparent 0.5px),
+      radial-gradient(circle at 70% 60%, #fff 0.5px, transparent 0.5px),
+      radial-gradient(circle at 40% 80%, #fff 0.5px, transparent 0.5px);
+    background-size: 3px 3px, 4px 4px, 5px 5px;
+    z-index: 2;
+  }
+
+  .app {
+    position: relative;
+    padding: 28px 22px 26px;
+    z-index: 1;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--chalk-dim);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--chalk);
+    margin: 0 0 26px;
+    letter-spacing: -0.01em;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 20px 18px;
+    margin-bottom: 16px;
+  }
+
+  .card h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--chalk);
+    margin: 0 0 4px;
+  }
+
+  .card .sub {
+    font-size: 12.5px;
+    color: var(--chalk-dim);
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .tier-btn {
+    appearance: none;
+    border: 1px solid var(--hairline-strong);
+    background: var(--panel-raised);
+    border-radius: 3px;
+    padding: 14px 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    position: relative;
+  }
+
+  .tier-btn:hover { transform: translateY(-1px); }
+
+  .tier-btn .mark {
+    display: block;
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    transition: all 0.15s ease;
+  }
+
+  .tier-btn[data-tier="trained"] .mark { background: var(--amber); }
+  .tier-btn[data-tier="skipped"] .mark { background: var(--skip); }
+  .tier-btn[data-tier="rest"] .mark { background: var(--rest); }
+
+  .tier-btn .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--chalk);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .tier-btn .desc {
+    font-size: 11px;
+    color: var(--chalk-dim);
+    line-height: 1.4;
+  }
+
+  .tier-btn.selected {
+    background: #40433A;
+  }
+
+  .tier-btn[data-tier="trained"].selected { box-shadow: inset 0 0 0 1px rgba(201,154,74,0.5); }
+  .tier-btn[data-tier="skipped"].selected { box-shadow: inset 0 0 0 1px rgba(124,139,147,0.6); }
+  .tier-btn[data-tier="rest"].selected { box-shadow: inset 0 0 0 1px rgba(91,94,88,0.6); }
+
+  .reason-block {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+    display: none;
+  }
+
+  .reason-block.visible {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reason-block .prompt {
+    font-size: 11.5px;
+    color: var(--chalk-dim);
+    margin: 0 0 10px;
+  }
+
+  .reason-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .reason-chip {
+    appearance: none;
+    border: 1px solid var(--hairline-strong);
+    background: transparent;
+    color: var(--chalk-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+    padding: 7px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .reason-chip:hover {
+    border-color: var(--hairline-strong);
+    color: var(--chalk);
+  }
+
+  .reason-chip.selected {
+    background: var(--skip);
+    border-color: var(--skip);
+    color: #1c1e1c;
+  }
+
+  .week-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .week-stat {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--chalk-dim);
+  }
+
+  .week-stat b { color: var(--chalk); font-weight: 500; }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    align-items: end;
+    height: 74px;
+    margin-bottom: 10px;
+  }
+
+  .day-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 8px;
+    cursor: default;
+  }
+
+  .stroke {
+    width: 5px;
+    border-radius: 3px;
+    background: var(--hairline-strong);
+    transition: height 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+  }
+
+  .day-col[data-tier="trained"] .stroke { background: var(--amber); height: 34px; }
+  .day-col[data-tier="skipped"] .stroke { background: var(--skip); height: 34px; }
+  .day-col[data-tier="rest"] .stroke { background: var(--rest); height: 34px; }
+  .day-col[data-tier="none"] .stroke { height: 3px; }
+
+  .day-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--chalk-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .day-col.is-today .day-label {
+    color: var(--chalk);
+    position: relative;
+  }
+
+  .day-col.is-today .day-label::after {
+    content: "";
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin: 4px auto 0;
+  }
+
+  .footnote {
+    font-size: 12px;
+    color: var(--chalk-dim);
+    text-align: center;
+    line-height: 1.5;
+    margin: 4px 10px 0;
+  }
+
+  .hairline-rule {
+    height: 1px;
+    background: var(--hairline);
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="app">
+    <p class="eyebrow">Training Log</p>
+    <h1>Thursday</h1>
+
+    <div class="card">
+      <h2>Mark today</h2>
+      <p class="sub">Pick whatever's true. No wrong answer.</p>
+      <div class="tiers">
+        <button class="tier-btn" data-tier="trained">
+          <span class="mark"></span>
+          <span class="label">Trained</span>
+          <span class="desc">Session done</span>
+        </button>
+        <button class="tier-btn" data-tier="skipped">
+          <span class="mark"></span>
+          <span class="label">Skipped</span>
+          <span class="desc">Didn't happen</span>
+        </button>
+        <button class="tier-btn" data-tier="rest">
+          <span class="mark"></span>
+          <span class="label">Rest</span>
+          <span class="desc">Planned day off</span>
+        </button>
+      </div>
+
+      <div class="reason-block" id="reasonBlock">
+        <p class="prompt">No pressure to answer, but what got in the way?</p>
+        <div class="reason-chips">
+          <button class="reason-chip" data-reason="busy">Busy</button>
+          <button class="reason-chip" data-reason="notfeelingit">Not feeling it</button>
+          <button class="reason-chip" data-reason="other">Other</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="week-header">
+        <h2 style="margin:0;">This week</h2>
+        <span class="week-stat"><b id="weekCount">3</b> / 7 marked</span>
+      </div>
+      <div class="strip" id="strip">
+        <div class="day-col" data-tier="trained"><div class="stroke"></div><span class="day-label">M</span></div>
+        <div class="day-col" data-tier="skipped"><div class="stroke"></div><span class="day-label">T</span></div>
+        <div class="day-col" data-tier="none"><div class="stroke"></div><span class="day-label">W</span></div>
+        <div class="day-col is-today" data-tier="none" id="todayCol"><div class="stroke"></div><span class="day-label">T</span></div>
+        <div class="day-col" data-tier="none"><div class="stroke"></div><span class="day-label">F</span></div>
+        <div class="day-col" data-tier="none"><div class="stroke"></div><span class="day-label">S</span></div>
+        <div class="day-col" data-tier="none"><div class="stroke"></div><span class="day-label">S</span></div>
+      </div>
+      <div class="hairline-rule"></div>
+      <p class="footnote">No streaks to break. Every mark stands on its own.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.tier-btn');
+  const todayCol = document.getElementById('todayCol');
+  const weekCount = document.getElementById('weekCount');
+  const reasonBlock = document.getElementById('reasonBlock');
+  const reasonChips = document.querySelectorAll('.reason-chip');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const tier = btn.getAttribute('data-tier');
+      const wasMarked = todayCol.getAttribute('data-tier') !== 'none';
+      todayCol.setAttribute('data-tier', tier);
+      if (!wasMarked) {
+        weekCount.textContent = parseInt(weekCount.textContent) + 1;
+      }
+
+      if (tier === 'skipped') {
+        reasonBlock.classList.add('visible');
+      } else {
+        reasonBlock.classList.remove('visible');
+        reasonChips.forEach(c => c.classList.remove('selected'));
+      }
+    });
+  });
+
+  reasonChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const alreadySelected = chip.classList.contains('selected');
+      reasonChips.forEach(c => c.classList.remove('selected'));
+      if (!alreadySelected) chip.classList.add('selected');
+    });
+  });
+</script>
+
+</body>
+</html>

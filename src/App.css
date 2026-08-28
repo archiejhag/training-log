@@ -1,0 +1,579 @@
+/* =========================================================================
+   Training Log — chalkboard visual style
+   Ported from Training Log — First Mockup.html and extended with the
+   training-log detail screen.
+   ========================================================================= */
+
+:root {
+  --bg: #2a2d2b;
+  --panel: #33362f;
+  --panel-raised: #3b3e36;
+  --field: #2f322c;
+  --chalk: #edece6;
+  --chalk-dim: #a6a9a0;
+  --amber: #c99a4a;
+  --skip: #7c8b93;
+  --rest: #8fa089;
+  --hairline: rgba(237, 236, 230, 0.1);
+  --hairline-strong: rgba(237, 236, 230, 0.18);
+}
+
+/* ---- Phone-shaped shell ---------------------------------------------- */
+
+.phone {
+  width: 420px;
+  max-width: 100%;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+/* faint chalk-dust speckle over the whole surface */
+.phone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image:
+    radial-gradient(circle at 20% 30%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 70% 60%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 40% 80%, #fff 0.5px, transparent 0.5px);
+  background-size: 3px 3px, 4px 4px, 5px 5px;
+  z-index: 2;
+}
+
+.app {
+  position: relative;
+  padding: 28px 22px 26px;
+  z-index: 1;
+}
+
+/* ---- Shared typography --------------------------------------------- */
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--chalk-dim);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.app h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--chalk);
+  margin: 0 0 26px;
+  letter-spacing: -0.01em;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 20px 18px;
+  margin-bottom: 16px;
+}
+
+.card h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--chalk);
+  margin: 0 0 4px;
+}
+
+.card .sub {
+  font-size: 12.5px;
+  color: var(--chalk-dim);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.footnote {
+  font-size: 12px;
+  color: var(--chalk-dim);
+  text-align: center;
+  line-height: 1.5;
+  margin: 4px 10px 0;
+}
+
+.footnote b {
+  color: var(--chalk);
+  font-weight: 500;
+}
+
+.hairline-rule {
+  height: 1px;
+  background: var(--hairline);
+  margin: 16px 0;
+}
+
+/* ---- Check-in: three tiers ---------------------------------------- */
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.tier-btn {
+  appearance: none;
+  border: 1px solid var(--hairline-strong);
+  background: var(--panel-raised);
+  border-radius: 3px;
+  padding: 14px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+  position: relative;
+}
+
+.tier-btn:hover {
+  transform: translateY(-1px);
+}
+
+.tier-btn .mark {
+  display: block;
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+  transition: all 0.15s ease;
+}
+
+.tier-btn[data-tier='trained'] .mark {
+  background: var(--amber);
+}
+.tier-btn[data-tier='skipped'] .mark {
+  background: var(--skip);
+}
+.tier-btn[data-tier='rest'] .mark {
+  background: var(--rest);
+}
+
+.tier-btn .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--chalk);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tier-btn .desc {
+  font-size: 11px;
+  color: var(--chalk-dim);
+  line-height: 1.4;
+  display: block;
+}
+
+.tier-btn.selected {
+  background: #40433a;
+}
+
+.tier-btn[data-tier='trained'].selected {
+  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.5);
+}
+.tier-btn[data-tier='skipped'].selected {
+  box-shadow: inset 0 0 0 1px rgba(124, 139, 147, 0.6);
+}
+.tier-btn[data-tier='rest'].selected {
+  box-shadow: inset 0 0 0 1px rgba(143, 160, 137, 0.6);
+}
+
+/* ---- Check-in: skip-reason chips -------------------------------- */
+
+.reason-block {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reason-block .prompt {
+  font-size: 11.5px;
+  color: var(--chalk-dim);
+  margin: 0 0 10px;
+}
+
+.reason-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reason-chip {
+  appearance: none;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  padding: 7px 11px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reason-chip:hover {
+  color: var(--chalk);
+}
+
+.reason-chip.selected {
+  background: var(--skip);
+  border-color: var(--skip);
+  color: #1c1e1c;
+}
+
+/* ---- Check-in: "note what you did?" prompt (only when Trained) -- */
+
+.log-prompt {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: fadeIn 0.2s ease;
+}
+
+.log-prompt-title {
+  font-size: 12.5px;
+  color: var(--chalk);
+  margin: 0 0 2px;
+}
+
+.log-prompt-sub {
+  font-size: 11px;
+  color: var(--chalk-dim);
+  margin: 0;
+}
+
+.ghost-btn {
+  appearance: none;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--chalk);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.ghost-btn:hover {
+  border-color: var(--chalk-dim);
+  transform: translateY(-1px);
+}
+
+/* ---- Weekly view ---------------------------------------------- */
+
+.week-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.week-stat {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  color: var(--chalk-dim);
+}
+
+.week-stat b {
+  color: var(--chalk);
+  font-weight: 500;
+}
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-items: end;
+  height: 74px;
+  margin-bottom: 10px;
+}
+
+.day-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 8px;
+}
+
+.logged-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.logged-dot.on {
+  background: var(--amber);
+}
+
+.stroke {
+  width: 5px;
+  border-radius: 3px;
+  background: var(--hairline-strong);
+  height: 3px;
+  transition:
+    height 0.3s ease,
+    background 0.3s ease;
+}
+
+.day-col[data-tier='trained'] .stroke {
+  background: var(--amber);
+  height: 34px;
+}
+.day-col[data-tier='skipped'] .stroke {
+  background: var(--skip);
+  height: 34px;
+}
+.day-col[data-tier='rest'] .stroke {
+  background: var(--rest);
+  height: 34px;
+}
+
+.day-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--chalk-dim);
+  letter-spacing: 0.02em;
+}
+
+.day-col.is-today .day-label {
+  color: var(--chalk);
+  position: relative;
+}
+
+.day-col.is-today .day-label::after {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--amber);
+  margin: 4px auto 0;
+}
+
+/* ---- Training-log detail screen --------------------------- */
+
+.back-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 0;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.back-btn:hover {
+  color: var(--chalk);
+}
+
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.exercise-row {
+  background: var(--panel-raised);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 12px;
+  animation: fadeIn 0.15s ease;
+}
+
+.exercise-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.exercise-name {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 9px 10px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.remove-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-size: 18px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.remove-btn:hover {
+  color: var(--chalk);
+  background: var(--hairline);
+}
+
+.exercise-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+}
+
+.field input {
+  appearance: none;
+  width: 100%;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 8px 9px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.exercise-name::placeholder,
+.field input::placeholder {
+  color: var(--chalk-dim);
+  opacity: 0.55;
+}
+
+.exercise-name:focus,
+.field input:focus {
+  outline: none;
+  border-color: rgba(201, 154, 74, 0.55);
+}
+
+.add-exercise,
+.empty-add {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 3px;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.add-exercise {
+  padding: 11px;
+  font-size: 11px;
+}
+
+.empty-add {
+  padding: 22px 12px;
+  font-size: 11.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-add .plus {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--chalk-dim);
+}
+
+.add-exercise:hover,
+.empty-add:hover {
+  color: var(--chalk);
+  border-color: var(--chalk-dim);
+}
+
+.done-btn {
+  appearance: none;
+  width: 100%;
+  border: none;
+  background: var(--amber);
+  color: #1c1e1c;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 14px;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.done-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
