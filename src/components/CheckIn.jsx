@@ -22,13 +22,18 @@ export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onO
       <h2>{isToday ? 'Mark today' : `Mark ${dateLabel}`}</h2>
       <p className="sub">Pick whatever's true. No wrong answer.</p>
 
-      <div className="tiers">
+      <div
+        className="tiers"
+        role="group"
+        aria-label={isToday ? 'Mark today' : `Mark ${dateLabel}`}
+      >
         {TIERS.map((t) => (
           <button
             key={t.id}
             type="button"
             className={'tier-btn' + (day.tier === t.id ? ' selected' : '')}
             data-tier={t.id}
+            aria-pressed={day.tier === t.id}
             onClick={() => onTier(t.id)}
           >
             <span className="mark" />
@@ -41,7 +46,7 @@ export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onO
       {day.tier === 'skipped' && (
         <div className="reason-block">
           <p className="prompt">No pressure to answer, but what got in the way?</p>
-          <div className="reason-chips">
+          <div className="reason-chips" role="group" aria-label="What got in the way?">
             {REASONS.map((r) => (
               <button
                 key={r.id}
@@ -49,6 +54,7 @@ export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onO
                 className={
                   'reason-chip' + (day.reason === r.id ? ' selected' : '')
                 }
+                aria-pressed={day.reason === r.id}
                 onClick={() => onReason(day.reason === r.id ? null : r.id)}
               >
                 {r.label}

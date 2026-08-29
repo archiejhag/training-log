@@ -18,6 +18,27 @@
   --hairline-strong: rgba(237, 236, 230, 0.18);
 }
 
+/* ---- Accessibility baseline ---------------------------------------- */
+
+/* One focus ring for everything reached by keyboard. Individual rules
+   below may override the offset; the colour stays the same. */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* Respect the OS "Reduce Motion" setting — kill animations and transitions
+   rather than just shortening them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ---- Phone-shaped shell ---------------------------------------------- */
 
 .phone {
@@ -776,7 +797,6 @@
 
 .exercise-name:focus,
 .field input:focus {
-  outline: none;
   border-color: rgba(201, 154, 74, 0.55);
 }
 

@@ -59,7 +59,7 @@ export default function App() {
 
   return (
     <div className="phone">
-      <div className="app">
+      <main className="app">
         {view === 'home' ? (
           <>
             <p className="eyebrow">Training Log</p>
@@ -108,7 +108,7 @@ export default function App() {
             onBack={() => setView('home')}
           />
         )}
-      </div>
+      </main>
     </div>
   );
 }

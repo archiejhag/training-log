@@ -12,6 +12,7 @@ export default function ExerciseRow({ exercise, onChange, onRemove }) {
         <input
           className="exercise-name"
           placeholder="Exercise"
+          aria-label="Exercise name"
           value={exercise.name}
           onChange={set('name')}
           autoComplete="off"
