@@ -31,3 +31,12 @@ body {
   display: flex;
   justify-content: center;
 }
+
+/* On phones the app fills the screen — no framed card, no margin. The
+   background matches the app so iOS overscroll doesn't reveal a seam. */
+@media (max-width: 520px) {
+  body {
+    padding: 0;
+    background: #2a2d2b;
+  }
+}
