@@ -12,6 +12,7 @@ import CatchUp from './components/CatchUp';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import TrainingLog from './components/TrainingLog';
+import Settings from './components/Settings';
 
 /* App owns:
    1. which view is on screen ('home' or the training-log detail screen)
@@ -23,9 +24,10 @@ import TrainingLog from './components/TrainingLog';
 export default function App() {
   const today = todayKey();
   const yesterday = yesterdayKey();
-  const { getDay, setTier, setReason, setExercises, prefs, setPref } = useTrainingLog();
+  const { getDay, setTier, setReason, setExercises, prefs, setPref, allData, replaceAll } =
+    useTrainingLog();
 
-  const [view, setView] = useState('home'); // 'home' | 'log'
+  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
 
@@ -62,7 +64,16 @@ export default function App() {
       <main className="app">
         {view === 'home' ? (
           <>
-            <p className="eyebrow">Training Log</p>
+            <div className="app-top">
+              <p className="eyebrow">Training Log</p>
+              <button
+                type="button"
+                className="settings-link"
+                onClick={() => setView('settings')}
+              >
+                Settings
+              </button>
+            </div>
             <div className="day-heading">
               <h1>{weekdayName(selectedDate)}</h1>
               {!isToday && (
@@ -100,6 +111,12 @@ export default function App() {
               onSelectDate={setSelectedDate}
             />
           </>
+        ) : view === 'settings' ? (
+          <Settings
+            allData={allData}
+            onImport={replaceAll}
+            onBack={() => setView('home')}
+          />
         ) : (
           <TrainingLog
             dateLabel={weekdayName(selectedDate)}

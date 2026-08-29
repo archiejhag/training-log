@@ -98,6 +98,15 @@ export function useTrainingLog() {
     }));
   }, []);
 
+  // Wholesale replace, for importing a backup. Normalises defensively —
+  // the caller (Settings) has already shape-checked, this is a backstop.
+  const replaceAll = useCallback((next) => {
+    setData({
+      days: (next && typeof next.days === 'object' && next.days) || {},
+      prefs: (next && typeof next.prefs === 'object' && next.prefs) || {},
+    });
+  }, []);
+
   return {
     getDay,
     setTier,
@@ -105,5 +114,7 @@ export function useTrainingLog() {
     setExercises,
     prefs: data.prefs,
     setPref,
+    allData: data,
+    replaceAll,
   };
 }

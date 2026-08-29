@@ -104,6 +104,30 @@
   margin: 0 0 6px;
 }
 
+.app-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.settings-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.settings-link:hover {
+  color: var(--chalk);
+}
+
 .app h1 {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
@@ -866,4 +890,25 @@
 .done-btn:hover {
   transform: translateY(-1px);
   filter: brightness(1.05);
+}
+
+/* ---- Settings screen ---------------------------------------------- */
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settings-msg {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+}
+
+.settings-msg.is-ok {
+  color: var(--rest);
+}
+
+.settings-msg.is-err {
+  color: var(--amber);
 }
