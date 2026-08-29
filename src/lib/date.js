@@ -16,6 +16,13 @@ export function todayKey() {
   return toKey(new Date());
 }
 
+/** Yesterday's key. setDate() handles month/year rollover for us. */
+export function yesterdayKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return toKey(d);
+}
+
 /** The 7 keys Mon..Sun for the week that contains `ref` (default: now). */
 export function weekKeys(ref = new Date()) {
   const start = new Date(ref);

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
-import { todayKey, weekKeys, weekdayName } from './lib/date';
+import { todayKey, yesterdayKey, weekKeys, weekdayName } from './lib/date';
+import CatchUp from './components/CatchUp';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import TrainingLog from './components/TrainingLog';
@@ -15,14 +16,20 @@ import TrainingLog from './components/TrainingLog';
 
 export default function App() {
   const today = todayKey();
+  const yesterday = yesterdayKey();
   const week = weekKeys();
-  const { getDay, setTier, setReason, setExercises } = useTrainingLog();
+  const { getDay, setTier, setReason, setExercises, prefs, setPref } = useTrainingLog();
 
   const [view, setView] = useState('home'); // 'home' | 'log'
   const [selectedDate, setSelectedDate] = useState(today);
 
   const day = getDay(selectedDate);
   const isToday = selectedDate === today;
+
+  // Nudge to fill in yesterday — only while it's blank and not already
+  // dismissed for this particular yesterday.
+  const showCatchUp =
+    getDay(yesterday).tier == null && prefs.catchUpDismissedFor !== yesterday;
 
   return (
     <div className="phone">
@@ -42,6 +49,14 @@ export default function App() {
                 </button>
               )}
             </div>
+
+            {showCatchUp && (
+              <CatchUp
+                dateLabel={weekdayName(yesterday)}
+                onMark={(tier) => setTier(yesterday, tier)}
+                onDismiss={() => setPref('catchUpDismissedFor', yesterday)}
+              />
+            )}
 
             <CheckIn
               day={day}

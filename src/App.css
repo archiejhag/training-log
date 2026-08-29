@@ -147,6 +147,103 @@
   margin: 16px 0;
 }
 
+/* ---- Catch-up-yesterday prompt --------------------------------- */
+/* No panel fill, just a hairline — reads as a transient nudge, not
+   a permanent part of the UI like the solid .card blocks below it. */
+
+.catch-up {
+  position: relative;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+.catch-up-text {
+  font-size: 12.5px;
+  color: var(--chalk-dim);
+  margin: 0 0 10px;
+  padding-right: 22px;
+}
+
+.catch-up-dismiss {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-size: 16px;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.catch-up-dismiss:hover {
+  color: var(--chalk);
+  background: var(--hairline);
+}
+
+.catch-up-tiers {
+  display: flex;
+  gap: 6px;
+}
+
+.catch-up-tier {
+  appearance: none;
+  flex: 1;
+  border: 1px solid var(--hairline-strong);
+  background: var(--panel-raised);
+  color: var(--chalk);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.catch-up-tier::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.catch-up-tier[data-tier='trained']::before {
+  background: var(--amber);
+}
+.catch-up-tier[data-tier='skipped']::before {
+  background: var(--skip);
+}
+.catch-up-tier[data-tier='rest']::before {
+  background: var(--rest);
+}
+
+.catch-up-tier:hover {
+  transform: translateY(-1px);
+  border-color: var(--chalk-dim);
+}
+
+.catch-up-tier:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
 /* ---- Check-in: three tiers ---------------------------------------- */
 
 .tiers {

@@ -1,13 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 
 /* One custom hook owns the entire data layer: the in-memory state, the shape
-   of a day, and reading/writing localStorage. Components never touch
-   localStorage directly — they call these functions. If you later swap
-   localStorage for Supabase, this file is the only one that changes. */
+   of the stored object, and reading/writing localStorage. Components never
+   touch localStorage directly — they call these functions. If you later swap
+   localStorage for Supabase, this file is the only one that changes.
+
+   Stored shape:
+     {
+       days:  { "YYYY-MM-DD": { tier, reason, exercises } },
+       prefs: { catchUpDismissedFor?, ... }   // app-wide settings, grows over time
+     }
+*/
 
 const STORAGE_KEY = 'training-log/v1';
 
-const EMPTY = { days: {} };
+const EMPTY = { days: {}, prefs: {} };
 
 /** The default record for a day nobody has marked yet. */
 export function blankDay() {
@@ -19,8 +26,11 @@ function load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return EMPTY;
     const parsed = JSON.parse(raw);
-    // Be defensive: a hand-edited or corrupted value shouldn't crash the app.
-    if (parsed && typeof parsed === 'object' && parsed.days) return parsed;
+    // Be defensive: a hand-edited or corrupted value shouldn't crash the app,
+    // and data saved before `prefs` existed is still valid.
+    if (parsed && typeof parsed === 'object' && parsed.days) {
+      return { days: parsed.days, prefs: parsed.prefs ?? {} };
+    }
     return EMPTY;
   } catch {
     return EMPTY;
@@ -81,5 +91,19 @@ export function useTrainingLog() {
     [patchDay],
   );
 
-  return { getDay, setTier, setReason, setExercises };
+  const setPref = useCallback((key, value) => {
+    setData((prev) => ({
+      ...prev,
+      prefs: { ...prev.prefs, [key]: value },
+    }));
+  }, []);
+
+  return {
+    getDay,
+    setTier,
+    setReason,
+    setExercises,
+    prefs: data.prefs,
+    setPref,
+  };
 }
