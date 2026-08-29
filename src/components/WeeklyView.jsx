@@ -1,13 +1,15 @@
+import { useState, useEffect, useRef } from 'react';
 import { dayLetter, weekdayName, weekRangeLabel } from '../lib/date';
 
 /* The "This week" card. Seven equal chalk strokes — colour tells you the
-   state, height never does. The count is "X / N marked", never a streak.
+   state, height never does. The count is "X / 7 marked", never a streak.
    A tiny amber dot above a stroke means that Trained day also has exercise
    detail logged.
 
    Each day is a real <button>: tapping it makes that day the one the
-   check-in card edits. Arrows page back through previous weeks; you can't
-   go past the current one. */
+   check-in card edits. The strip is a toolbar with roving tabindex — Tab
+   lands on it once, then arrow keys move between days. Arrows on the header
+   page back through previous weeks; you can't go past the current one. */
 
 function weekLabel(weekOffset, week) {
   if (weekOffset === 0) return 'This week';
@@ -25,6 +27,34 @@ export default function WeeklyView({
   onSelectDate,
 }) {
   const marked = week.filter((key) => getDay(key).tier).length;
+  const stripRef = useRef(null);
+
+  // Which column is Tab-reachable / arrow-key focused. Defaults to the
+  // selected day when it's on screen, else Monday.
+  const [focusIndex, setFocusIndex] = useState(() => {
+    const i = week.indexOf(selectedDate);
+    return i >= 0 ? i : 0;
+  });
+
+  // Realign when the week is paged or the selection changes from elsewhere.
+  // `week` is a fresh array each render, so key off the stable signals.
+  useEffect(() => {
+    const i = week.indexOf(selectedDate);
+    setFocusIndex(i >= 0 ? i : 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, weekOffset]);
+
+  const onKeyDown = (e) => {
+    let next = focusIndex;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = Math.min(6, focusIndex + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = Math.max(0, focusIndex - 1);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = 6;
+    else return;
+    e.preventDefault();
+    setFocusIndex(next);
+    stripRef.current?.children[next]?.focus();
+  };
 
   return (
     <section className="card">
@@ -49,17 +79,19 @@ export default function WeeklyView({
             &rsaquo;
           </button>
         </div>
-        <span className="week-stat">
+        <span className="week-stat" aria-live="polite">
           <b>{marked}</b> / 7 marked
         </span>
       </div>
 
       <div
         className="strip"
-        role="group"
-        aria-label="Days this week — tap a day to fill it in"
+        role="toolbar"
+        aria-label="Days this week"
+        ref={stripRef}
+        onKeyDown={onKeyDown}
       >
-        {week.map((key) => {
+        {week.map((key, i) => {
           const day = getDay(key);
           const hasDetail = day.tier === 'trained' && day.exercises.length > 0;
           const isToday = key === today;
@@ -69,6 +101,7 @@ export default function WeeklyView({
             <button
               key={key}
               type="button"
+              tabIndex={i === focusIndex ? 0 : -1}
               className={
                 'day-col' +
                 (isToday ? ' is-today' : '') +
