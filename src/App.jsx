@@ -6,9 +6,11 @@ import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import TrainingLog from './components/TrainingLog';
 
-/* App owns two things:
+/* App owns three things:
    1. which view is on screen ('home' or the training-log detail screen)
-   2. wiring the data hook to the components
+   2. which day is being edited (selectedDate — defaults to today, the strip
+      can point it at any day this week)
+   3. wiring the data hook to the components
    All persistence lives in useTrainingLog; all date maths in lib/date. */
 
 export default function App() {
@@ -17,7 +19,10 @@ export default function App() {
   const { getDay, setTier, setReason, setExercises } = useTrainingLog();
 
   const [view, setView] = useState('home'); // 'home' | 'log'
-  const day = getDay(today);
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  const day = getDay(selectedDate);
+  const isToday = selectedDate === today;
 
   return (
     <div className="phone">
@@ -25,22 +30,41 @@ export default function App() {
         {view === 'home' ? (
           <>
             <p className="eyebrow">Training Log</p>
-            <h1>{weekdayName(today)}</h1>
+            <div className="day-heading">
+              <h1>{weekdayName(selectedDate)}</h1>
+              {!isToday && (
+                <button
+                  type="button"
+                  className="back-to-today"
+                  onClick={() => setSelectedDate(today)}
+                >
+                  Back to today
+                </button>
+              )}
+            </div>
 
             <CheckIn
               day={day}
-              onTier={(tier) => setTier(today, tier)}
-              onReason={(reason) => setReason(today, reason)}
+              isToday={isToday}
+              dateLabel={weekdayName(selectedDate)}
+              onTier={(tier) => setTier(selectedDate, tier)}
+              onReason={(reason) => setReason(selectedDate, reason)}
               onOpenLog={() => setView('log')}
             />
 
-            <WeeklyView week={week} getDay={getDay} today={today} />
+            <WeeklyView
+              week={week}
+              getDay={getDay}
+              today={today}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
           </>
         ) : (
           <TrainingLog
-            dateLabel={weekdayName(today)}
+            dateLabel={weekdayName(selectedDate)}
             exercises={day.exercises}
-            onChange={(exercises) => setExercises(today, exercises)}
+            onChange={(exercises) => setExercises(selectedDate, exercises)}
             onBack={() => setView('home')}
           />
         )}

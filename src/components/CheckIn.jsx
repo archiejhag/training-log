@@ -14,12 +14,12 @@ const REASONS = [
   { id: 'other', label: 'Other' },
 ];
 
-export default function CheckIn({ day, onTier, onReason, onOpenLog }) {
+export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onOpenLog }) {
   const count = day.exercises.length;
 
   return (
     <section className="card">
-      <h2>Mark today</h2>
+      <h2>{isToday ? 'Mark today' : `Mark ${dateLabel}`}</h2>
       <p className="sub">Pick whatever's true. No wrong answer.</p>
 
       <div className="tiers">
