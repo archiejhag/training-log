@@ -11,6 +11,14 @@ export function toKey(date) {
   return `${y}-${m}-${d}`;
 }
 
+/** "2026-08-28" -> a local Date at midnight. `new Date("2026-08-28")` would
+   parse as UTC and can land on the wrong day in western time zones, so we
+   split the parts out by hand. */
+export function parseKey(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 /** Today's key. */
 export function todayKey() {
   return toKey(new Date());
@@ -38,16 +46,36 @@ export function weekKeys(ref = new Date()) {
   });
 }
 
+/** The Mon..Sun keys for a week `n` weeks from this one (n < 0 = past). */
+export function weekKeysForOffset(n) {
+  const ref = new Date();
+  ref.setDate(ref.getDate() + n * 7);
+  return weekKeys(ref);
+}
+
+/** 0 = Monday .. 6 = Sunday, for lining a date up with a column in the strip. */
+export function weekdayIndex(key) {
+  return (parseKey(key).getDay() + 6) % 7;
+}
+
 const LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 /** "2026-08-28" -> "F" (single-letter weekday for the strip). */
 export function dayLetter(key) {
-  const [y, m, d] = key.split('-').map(Number);
-  return LETTERS[new Date(y, m - 1, d).getDay()];
+  return LETTERS[parseKey(key).getDay()];
 }
 
 /** "2026-08-28" -> "Thursday" (used as the screen title). */
 export function weekdayName(key) {
-  const [y, m, d] = key.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long' });
+  return parseKey(key).toLocaleDateString('en-US', { weekday: 'long' });
+}
+
+/** ("2026-08-18", "2026-08-24") -> "18–24 Aug"  (or "28 Jul – 3 Aug"). */
+export function weekRangeLabel(startKey, endKey) {
+  const start = parseKey(startKey);
+  const end = parseKey(endKey);
+  const mon = (d) => d.toLocaleDateString('en-US', { month: 'short' });
+  return start.getMonth() === end.getMonth()
+    ? `${start.getDate()}–${end.getDate()} ${mon(end)}`
+    : `${start.getDate()} ${mon(start)} – ${end.getDate()} ${mon(end)}`;
 }
