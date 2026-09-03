@@ -4,14 +4,22 @@ import ExerciseRow from './ExerciseRow';
    and it never blocks you: no required fields, no save button that can
    fail, and blank rows are quietly dropped when you leave. */
 
+const newId = () =>
+  crypto.randomUUID?.() ?? String(Date.now() + Math.random());
+
 function newExercise() {
-  return {
-    id: crypto.randomUUID?.() ?? String(Date.now() + Math.random()),
-    name: '',
-    sets: '',
-    reps: '',
-    weight: '',
-  };
+  return { id: newId(), name: '', sets: '', reps: '', weight: '' };
+}
+
+// clone last session's rows with fresh ids, keeping the numbers to adjust from
+function cloneExercises(list) {
+  return list.map((x) => ({
+    id: newId(),
+    name: x.name,
+    sets: x.sets,
+    reps: x.reps,
+    weight: x.weight,
+  }));
 }
 
 function isBlank(x) {
@@ -22,6 +30,7 @@ export default function TrainingLog({
   dateLabel,
   exercises,
   suggestions = [],
+  lastSession = null,
   onChange,
   onBack,
 }) {
@@ -53,10 +62,25 @@ export default function TrainingLog({
         <p className="sub">Rough notes are fine. Leave anything blank.</p>
 
         {exercises.length === 0 ? (
-          <button type="button" className="empty-add" onClick={add}>
-            <span className="plus">+</span>
-            Add your first exercise
-          </button>
+          <div className="empty-actions">
+            {lastSession && (
+              <button
+                type="button"
+                className="repeat-btn"
+                onClick={() => onChange(cloneExercises(lastSession.exercises))}
+              >
+                <span className="repeat-title">Repeat last session</span>
+                <span className="repeat-sub">
+                  {lastSession.label} · {lastSession.exercises.length} exercise
+                  {lastSession.exercises.length === 1 ? '' : 's'}
+                </span>
+              </button>
+            )}
+            <button type="button" className="empty-add" onClick={add}>
+              <span className="plus">+</span>
+              {lastSession ? 'Start a fresh list' : 'Add your first exercise'}
+            </button>
+          </div>
         ) : (
           <>
             <div className="exercise-list">

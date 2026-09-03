@@ -64,6 +64,19 @@ export default function App() {
     return names;
   }, [allData]);
 
+  // The most recent Trained day *before* the one being edited that actually
+  // has exercises — the "last session" to clone from.
+  const lastSession = useMemo(() => {
+    for (const key of Object.keys(allData.days).sort().reverse()) {
+      if (key >= selectedDate) continue;
+      const d = allData.days[key];
+      if (d.tier === 'trained' && (d.exercises?.length ?? 0) > 0) {
+        return { label: weekdayName(key), exercises: d.exercises };
+      }
+    }
+    return null;
+  }, [allData, selectedDate]);
+
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
   const hasHistory = Object.keys(allData.days).length > 0;
@@ -196,6 +209,7 @@ export default function App() {
             dateLabel={weekdayName(selectedDate)}
             exercises={day.exercises}
             suggestions={exerciseNames}
+            lastSession={lastSession}
             onChange={(exercises) => setExercises(selectedDate, exercises)}
             onBack={() => setView('home')}
           />
