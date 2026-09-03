@@ -35,6 +35,8 @@ export default function CheckIn({
   onOpenLog,
 }) {
   const count = day.exercises.length;
+  const freeText = (day.freeform ?? '').trim();
+  const hasLog = count > 0 || freeText !== '';
 
   return (
     <section className="card">
@@ -103,16 +105,23 @@ export default function CheckIn({
       )}
 
       {day.tier === 'trained' &&
-        (count > 0 ? (
+        (hasLog ? (
           <div className="session-summary">
-            <ul className="summary-list">
-              {day.exercises.map((ex) => (
-                <li key={ex.id}>
-                  <span className="summary-name">{ex.name || 'Exercise'}</span>
-                  <span className="summary-metric">{summariseExercise(ex)}</span>
-                </li>
-              ))}
-            </ul>
+            {count > 0 && (
+              <ul className="summary-list">
+                {day.exercises.map((ex) => (
+                  <li key={ex.id}>
+                    <span className="summary-name">{ex.name || 'Exercise'}</span>
+                    <span className="summary-metric">
+                      {summariseExercise(ex)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {freeText !== '' && (
+              <p className="summary-freeform">{freeText}</p>
+            )}
             <button
               type="button"
               className="ghost-btn summary-edit"

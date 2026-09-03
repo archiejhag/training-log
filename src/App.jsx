@@ -34,6 +34,7 @@ export default function App() {
     setType,
     setNote,
     setExercises,
+    setFreeform,
     prefs,
     setPref,
     allData,
@@ -257,12 +258,14 @@ export default function App() {
           <TrainingLog
             dateLabel={weekdayName(selectedDate)}
             exercises={day.exercises}
+            freeform={day.freeform ?? ''}
             suggestions={exerciseNames}
             fillOptions={fillOptions}
             presets={presets}
             onSavePreset={savePreset}
             onDeletePreset={deletePreset}
             onChange={(exercises) => setExercises(selectedDate, exercises)}
+            onFreeformChange={(text) => setFreeform(selectedDate, text)}
             onBack={() => setView('home')}
           />
         )}

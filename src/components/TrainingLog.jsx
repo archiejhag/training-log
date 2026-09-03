@@ -6,9 +6,12 @@ import { newId } from '../lib/id';
    and it never blocks you: no required fields, no save button that can
    fail, and blank rows are quietly dropped when you leave.
 
-   An empty log offers quick fills: the same weekday's last session, the
-   most recent session, and any saved presets. A non-empty log can be
-   saved as a preset for next time. */
+   Two ways to log, switchable at the top:
+   - "Exercises": structured rows. An empty list offers quick fills (the
+     same weekday's last session, the most recent session, saved presets);
+     a non-empty list can be saved as a preset.
+   - "Just write it": one plain textarea. Some days you only want to type
+     "8k run, felt good". */
 
 function newExercise() {
   return { id: newId(), name: '', sets: '', reps: '', weight: '' };
@@ -64,18 +67,25 @@ function toTemplate(list) {
 export default function TrainingLog({
   dateLabel,
   exercises,
+  freeform = '',
   suggestions = [],
   fillOptions = [],
   presets = [],
   onSavePreset,
   onDeletePreset,
   onChange,
+  onFreeformChange,
   onBack,
 }) {
   const [showPresets, setShowPresets] = useState(false);
   const [naming, setNaming] = useState(false);
   const [presetName, setPresetName] = useState('');
   const [saved, setSaved] = useState(null);
+  // Open on whichever side already has something in it. Falls back to the
+  // structured rows for a blank day.
+  const [mode, setMode] = useState(() =>
+    freeform.trim() && exercises.length === 0 ? 'freeform' : 'structured',
+  );
 
   const hasContent = exercises.some((x) => !isBlank(x));
 
@@ -114,9 +124,41 @@ export default function TrainingLog({
 
       <section className="card">
         <h2>What did you do?</h2>
-        <p className="sub">Rough notes are fine. Leave anything blank.</p>
 
-        {exercises.length === 0 ? (
+        <div className="log-mode" role="group" aria-label="How to log">
+          {['structured', 'freeform'].map((m) => (
+            <button
+              key={m}
+              type="button"
+              className={mode === m ? 'is-on' : undefined}
+              aria-pressed={mode === m}
+              onClick={() => setMode(m)}
+            >
+              {m === 'structured' ? 'Exercises' : 'Just write it'}
+            </button>
+          ))}
+        </div>
+
+        {mode === 'freeform' ? (
+          <>
+            <p className="sub">
+              One box. Whatever you did — “8k run, felt good.”
+            </p>
+            <textarea
+              className="freeform-input"
+              rows={5}
+              maxLength={2000}
+              placeholder="8k run, felt good. Legs still heavy from Tuesday."
+              aria-label="What I did"
+              value={freeform}
+              onChange={(e) => onFreeformChange(e.target.value)}
+            />
+          </>
+        ) : (
+          <>
+            <p className="sub">Rough notes are fine. Leave anything blank.</p>
+
+            {exercises.length === 0 ? (
           <div className="empty-actions">
             {showPresets ? (
               <>
@@ -253,6 +295,8 @@ export default function TrainingLog({
                 Saved as “{saved}”
               </p>
             )}
+          </>
+        )}
           </>
         )}
       </section>

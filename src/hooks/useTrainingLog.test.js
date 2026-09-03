@@ -112,6 +112,18 @@ describe('setNote', () => {
   });
 });
 
+describe('setFreeform', () => {
+  test('sets the freeform block and it survives a tier change', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setFreeform('d', '8k run, felt good'));
+    expect(result.current.getDay('d').freeform).toBe('8k run, felt good');
+    act(() => result.current.setTier('d', 'trained'));
+    expect(result.current.getDay('d').freeform).toBe('8k run, felt good');
+    act(() => result.current.setTier('d', null));
+    expect(result.current.getDay('d').freeform).toBe('8k run, felt good');
+  });
+});
+
 describe('setPref', () => {
   test('merges rather than replacing', () => {
     const { result } = renderHook(() => useTrainingLog());

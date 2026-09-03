@@ -7,12 +7,13 @@ import { useState, useEffect, useCallback } from 'react';
 
    Stored shape:
      {
-       days:  { "YYYY-MM-DD": { tier, reason, type, note, exercises } },
+       days:  { "YYYY-MM-DD": { tier, reason, type, note, freeform, exercises } },
        prefs: { catchUpDismissedFor?, ... }   // app-wide settings, grows over time
      }
    (`type` — push/pull/legs/cardio/mobility — is optional and only meaningful
-   on a Trained day. `note` is a freeform line that belongs to any day,
-   whatever its tier.)
+   on a Trained day. `note` is a short freeform line that belongs to any day,
+   whatever its tier. `freeform` is the longer "just type what I did" block —
+   an alternative to the structured `exercises` list on a Trained day.)
 */
 
 const STORAGE_KEY = 'training-log/v1';
@@ -21,7 +22,14 @@ const EMPTY = { days: {}, prefs: {} };
 
 /** The default record for a day nobody has marked yet. */
 export function blankDay() {
-  return { tier: null, reason: null, type: null, note: '', exercises: [] };
+  return {
+    tier: null,
+    reason: null,
+    type: null,
+    note: '',
+    freeform: '',
+    exercises: [],
+  };
 }
 
 function load() {
@@ -106,6 +114,13 @@ export function useTrainingLog() {
     [patchDay],
   );
 
+  // The long "just type it" block. Like `exercises`, it's left alone when the
+  // tier changes — re-marking a day doesn't throw away what you wrote.
+  const setFreeform = useCallback(
+    (key, freeform) => patchDay(key, { freeform }),
+    [patchDay],
+  );
+
   const setPref = useCallback((key, value) => {
     setData((prev) => ({
       ...prev,
@@ -129,6 +144,7 @@ export function useTrainingLog() {
     setType,
     setNote,
     setExercises,
+    setFreeform,
     prefs: data.prefs,
     setPref,
     allData: data,
