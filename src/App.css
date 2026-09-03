@@ -674,10 +674,53 @@
   background: var(--hairline-strong);
   height: 3px;
   filter: url(#chalk-edge);
+  transform: rotate(var(--lean, 0deg));
   transform-origin: bottom center;
   transition:
     height 0.3s ease,
     background 0.3s ease;
+}
+
+/* mark a day → stroke grows up with a little elastic settle;
+   clear a day → it gets wiped sideways, not just shrunk.
+   prefers-reduced-motion (global rule) zeroes the durations. */
+.day-col.anim-in .stroke {
+  animation: stroke-draw-on 0.42s cubic-bezier(0.33, 1.4, 0.6, 1);
+}
+
+.day-col.anim-out .stroke {
+  animation: stroke-erase 0.34s ease-in;
+}
+
+@keyframes stroke-draw-on {
+  0% {
+    transform: rotate(var(--lean, 0deg)) scaleY(0.86);
+  }
+  65% {
+    transform: rotate(var(--lean, 0deg)) scaleY(1.09);
+  }
+  100% {
+    transform: rotate(var(--lean, 0deg)) scaleY(1);
+  }
+}
+
+@keyframes stroke-erase {
+  0% {
+    transform: rotate(var(--lean, 0deg)) translateX(0) scaleY(1);
+    opacity: 1;
+  }
+  35% {
+    transform: rotate(var(--lean, 0deg)) translateX(2px) skewX(-12deg) scaleY(0.9);
+    opacity: 0.55;
+  }
+  70% {
+    transform: rotate(var(--lean, 0deg)) translateX(-9px) skewX(16deg) scaleY(0.28);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(var(--lean, 0deg)) translateX(0) scaleY(1);
+    opacity: 1;
+  }
 }
 
 /* chalk dust drifting off each end. One 1.6px speck cloned by box-shadow
@@ -719,14 +762,16 @@
     1px 11px 0.4px -0.65px currentColor;
 }
 
-/* a degree or two of lean per column — a hand, not a ruler */
-.strip .day-col:nth-child(1) .stroke { transform: rotate(-1.6deg); }
-.strip .day-col:nth-child(2) .stroke { transform: rotate(1deg); }
-.strip .day-col:nth-child(3) .stroke { transform: rotate(-0.5deg); }
-.strip .day-col:nth-child(4) .stroke { transform: rotate(1.4deg); }
-.strip .day-col:nth-child(5) .stroke { transform: rotate(-1.1deg); }
-.strip .day-col:nth-child(6) .stroke { transform: rotate(0.6deg); }
-.strip .day-col:nth-child(7) .stroke { transform: rotate(-1.3deg); }
+/* a degree or two of lean per column — a hand, not a ruler. Held in a
+   custom property so the draw-on / erase keyframes can keep the lean
+   while they animate scaleY / translateX. */
+.strip .day-col:nth-child(1) .stroke { --lean: -1.6deg; }
+.strip .day-col:nth-child(2) .stroke { --lean: 1deg; }
+.strip .day-col:nth-child(3) .stroke { --lean: -0.5deg; }
+.strip .day-col:nth-child(4) .stroke { --lean: 1.4deg; }
+.strip .day-col:nth-child(5) .stroke { --lean: -1.1deg; }
+.strip .day-col:nth-child(6) .stroke { --lean: 0.6deg; }
+.strip .day-col:nth-child(7) .stroke { --lean: -1.3deg; }
 
 .day-col[data-tier='trained'] .stroke {
   background: var(--amber);

@@ -29,6 +29,46 @@ export default function WeeklyView({
   const marked = week.filter((key) => getDay(key).tier).length;
   const stripRef = useRef(null);
 
+  // --- draw-on / erase pulse ---------------------------------------
+  // When a visible day's tier changes, tag that column 'in' (just marked)
+  // or 'out' (just cleared) for one animation, then untag it. CSS keys the
+  // keyframes off those classes. Paging weeks must NOT trigger it, so we
+  // watch weekOffset and skip the diff on a week change.
+  const tierSig = week.map((k) => getDay(k).tier ?? '-').join('|');
+  const prevSigRef = useRef(tierSig);
+  const prevOffsetRef = useRef(weekOffset);
+  const [pulse, setPulse] = useState({});
+
+  useEffect(() => {
+    if (prevOffsetRef.current !== weekOffset) {
+      prevOffsetRef.current = weekOffset;
+      prevSigRef.current = tierSig;
+      return;
+    }
+    const prev = prevSigRef.current.split('|');
+    const curr = tierSig.split('|');
+    prevSigRef.current = tierSig;
+
+    const changed = {};
+    week.forEach((key, i) => {
+      if (prev[i] !== undefined && prev[i] !== curr[i]) {
+        changed[key] = curr[i] === '-' ? 'out' : 'in';
+      }
+    });
+    if (!Object.keys(changed).length) return;
+
+    setPulse((p) => ({ ...p, ...changed }));
+    const t = setTimeout(() => {
+      setPulse((p) => {
+        const n = { ...p };
+        Object.keys(changed).forEach((k) => delete n[k]);
+        return n;
+      });
+    }, 450);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tierSig, weekOffset]);
+
   // Which column is Tab-reachable / arrow-key focused. Defaults to the
   // selected day when it's on screen, else Monday.
   const [focusIndex, setFocusIndex] = useState(() => {
@@ -105,7 +145,9 @@ export default function WeeklyView({
               className={
                 'day-col' +
                 (isToday ? ' is-today' : '') +
-                (isSelected ? ' is-selected' : '')
+                (isSelected ? ' is-selected' : '') +
+                (pulse[key] === 'in' ? ' anim-in' : '') +
+                (pulse[key] === 'out' ? ' anim-out' : '')
               }
               data-tier={day.tier ?? 'none'}
               aria-pressed={isSelected}
