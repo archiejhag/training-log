@@ -668,6 +668,7 @@
 
 .stroke {
   display: block;
+  position: relative;
   width: 5px;
   border-radius: 3px;
   background: var(--hairline-strong);
@@ -677,6 +678,45 @@
   transition:
     height 0.3s ease,
     background 0.3s ease;
+}
+
+/* chalk dust drifting off each end. One 1.6px speck cloned by box-shadow
+   into a tapering scatter; colour comes from currentColor (set per tier
+   below). Hidden until a day is marked. The #chalk-edge filter catches
+   these too, which only adds to the grit. */
+.stroke::before,
+.stroke::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 1.6px;
+  height: 1.6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stroke::before {
+  top: -1px;
+  box-shadow:
+    2px -2px 0.3px 0 currentColor,
+    -3px -3px 0.3px -0.1px currentColor,
+    5px -5px 0.4px -0.2px currentColor,
+    -2px -7px 0.4px -0.35px currentColor,
+    3px -9px 0.4px -0.45px currentColor,
+    -1px -11px 0.4px -0.6px currentColor;
+}
+
+.stroke::after {
+  bottom: -1px;
+  box-shadow:
+    -2px 2px 0.3px 0 currentColor,
+    4px 3px 0.3px -0.1px currentColor,
+    -4px 5px 0.4px -0.2px currentColor,
+    2px 7px 0.4px -0.4px currentColor,
+    -2px 9px 0.4px -0.5px currentColor,
+    1px 11px 0.4px -0.65px currentColor;
 }
 
 /* a degree or two of lean per column — a hand, not a ruler */
@@ -690,15 +730,26 @@
 
 .day-col[data-tier='trained'] .stroke {
   background: var(--amber);
+  color: var(--amber);
   height: 34px;
 }
 .day-col[data-tier='skipped'] .stroke {
   background: var(--skip);
+  color: var(--skip);
   height: 34px;
 }
 .day-col[data-tier='rest'] .stroke {
   background: var(--rest);
+  color: var(--rest);
   height: 34px;
+}
+
+/* dust only on the marked strokes, not the 3px "not marked" nubs */
+.day-col:is([data-tier='trained'], [data-tier='skipped'], [data-tier='rest'])
+  .stroke::before,
+.day-col:is([data-tier='trained'], [data-tier='skipped'], [data-tier='rest'])
+  .stroke::after {
+  opacity: 0.6;
 }
 
 .day-label {
