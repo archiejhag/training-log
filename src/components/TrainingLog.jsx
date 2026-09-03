@@ -1,24 +1,27 @@
+import { useState } from 'react';
 import ExerciseRow from './ExerciseRow';
+import { newId } from '../lib/id';
 
 /* The optional detail screen. It only exists for a day marked "Trained",
    and it never blocks you: no required fields, no save button that can
-   fail, and blank rows are quietly dropped when you leave. */
+   fail, and blank rows are quietly dropped when you leave.
 
-const newId = () =>
-  crypto.randomUUID?.() ?? String(Date.now() + Math.random());
+   An empty log offers quick fills: the same weekday's last session, the
+   most recent session, and any saved presets. A non-empty log can be
+   saved as a preset for next time. */
 
 function newExercise() {
   return { id: newId(), name: '', sets: '', reps: '', weight: '' };
 }
 
-// clone last session's rows with fresh ids, keeping the numbers to adjust from
+// copy a template list into fresh, editable rows (keep the numbers to adjust)
 function cloneExercises(list) {
   return list.map((x) => ({
     id: newId(),
-    name: x.name,
-    sets: x.sets,
-    reps: x.reps,
-    weight: x.weight,
+    name: x.name ?? '',
+    sets: x.sets ?? '',
+    reps: x.reps ?? '',
+    weight: x.weight ?? '',
   }));
 }
 
@@ -26,26 +29,45 @@ function isBlank(x) {
   return !x.name.trim() && !x.sets.trim() && !x.reps.trim() && !x.weight.trim();
 }
 
+// preset templates carry no ids and no blank rows
+function toTemplate(list) {
+  return list
+    .filter((x) => !isBlank(x))
+    .map(({ name, sets, reps, weight }) => ({ name, sets, reps, weight }));
+}
+
 export default function TrainingLog({
   dateLabel,
   exercises,
   suggestions = [],
-  lastSession = null,
+  fillOptions = [],
+  presets = [],
+  onSavePreset,
+  onDeletePreset,
   onChange,
   onBack,
 }) {
+  const [showPresets, setShowPresets] = useState(false);
+  const [saved, setSaved] = useState(null);
+
   const update = (id, next) =>
     onChange(exercises.map((x) => (x.id === id ? next : x)));
-
   const remove = (id) => onChange(exercises.filter((x) => x.id !== id));
-
   const add = () => onChange([...exercises, newExercise()]);
 
-  // Leaving the screen tidies up: anything still completely empty is discarded,
-  // so the weekly "logged" dot only lights when there's real content.
   const finish = () => {
     onChange(exercises.filter((x) => !isBlank(x)));
     onBack();
+  };
+
+  const saveAsPreset = () => {
+    const template = toTemplate(exercises);
+    if (template.length === 0) return;
+    const name = window.prompt('Name this preset (e.g. Push day)');
+    if (!name?.trim()) return;
+    onSavePreset(name.trim(), template);
+    setSaved(name.trim());
+    window.setTimeout(() => setSaved(null), 2500);
   };
 
   return (
@@ -63,23 +85,75 @@ export default function TrainingLog({
 
         {exercises.length === 0 ? (
           <div className="empty-actions">
-            {lastSession && (
-              <button
-                type="button"
-                className="repeat-btn"
-                onClick={() => onChange(cloneExercises(lastSession.exercises))}
-              >
-                <span className="repeat-title">Repeat last session</span>
-                <span className="repeat-sub">
-                  {lastSession.label} · {lastSession.exercises.length} exercise
-                  {lastSession.exercises.length === 1 ? '' : 's'}
-                </span>
-              </button>
+            {showPresets ? (
+              <>
+                {presets.map((p) => (
+                  <div key={p.id} className="preset-row">
+                    <button
+                      type="button"
+                      className="preset-load"
+                      onClick={() => {
+                        setShowPresets(false);
+                        onChange(cloneExercises(p.exercises));
+                      }}
+                    >
+                      <span className="repeat-title">{p.name}</span>
+                      <span className="repeat-sub">
+                        {p.exercises.length} exercise
+                        {p.exercises.length === 1 ? '' : 's'}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="preset-del"
+                      aria-label={`Delete preset ${p.name}`}
+                      onClick={() => onDeletePreset(p.id)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="link-btn"
+                  onClick={() => setShowPresets(false)}
+                >
+                  &larr; Back
+                </button>
+              </>
+            ) : (
+              <>
+                {fillOptions.map((opt) => (
+                  <button
+                    key={opt.title}
+                    type="button"
+                    className="repeat-btn"
+                    onClick={() => onChange(cloneExercises(opt.exercises))}
+                  >
+                    <span className="repeat-title">{opt.title}</span>
+                    <span className="repeat-sub">{opt.detail}</span>
+                  </button>
+                ))}
+                {presets.length > 0 && (
+                  <button
+                    type="button"
+                    className="repeat-btn"
+                    onClick={() => setShowPresets(true)}
+                  >
+                    <span className="repeat-title">From a preset</span>
+                    <span className="repeat-sub">
+                      {presets.length} saved
+                    </span>
+                  </button>
+                )}
+                <button type="button" className="empty-add" onClick={add}>
+                  <span className="plus">+</span>
+                  {fillOptions.length || presets.length
+                    ? 'Start a fresh list'
+                    : 'Add your first exercise'}
+                </button>
+              </>
             )}
-            <button type="button" className="empty-add" onClick={add}>
-              <span className="plus">+</span>
-              {lastSession ? 'Start a fresh list' : 'Add your first exercise'}
-            </button>
           </div>
         ) : (
           <>
@@ -97,6 +171,14 @@ export default function TrainingLog({
             <button type="button" className="add-exercise" onClick={add}>
               + Add exercise
             </button>
+            <button type="button" className="link-btn" onClick={saveAsPreset}>
+              Save these as a preset
+            </button>
+            {saved && (
+              <p className="saved-msg" role="status">
+                Saved as “{saved}”
+              </p>
+            )}
           </>
         )}
       </section>

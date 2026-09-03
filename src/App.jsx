@@ -4,10 +4,12 @@ import { useTrainingLog } from './hooks/useTrainingLog';
 import {
   todayKey,
   yesterdayKey,
+  parseKey,
   weekKeysForOffset,
   weekdayIndex,
   weekdayName,
 } from './lib/date';
+import { newId } from './lib/id';
 import CatchUp from './components/CatchUp';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
@@ -64,18 +66,53 @@ export default function App() {
     return names;
   }, [allData]);
 
-  // The most recent Trained day *before* the one being edited that actually
-  // has exercises — the "last session" to clone from.
-  const lastSession = useMemo(() => {
-    for (const key of Object.keys(allData.days).sort().reverse()) {
-      if (key >= selectedDate) continue;
-      const d = allData.days[key];
-      if (d.tier === 'trained' && (d.exercises?.length ?? 0) > 0) {
-        return { label: weekdayName(key), exercises: d.exercises };
-      }
+  // Quick-fill options for an empty training log, prior Trained-with-exercises
+  // days only: the last matching *this weekday* (splits repeat weekly, not
+  // day-to-day), then the most recent session overall. De-duped.
+  const fillOptions = useMemo(() => {
+    const before = Object.keys(allData.days)
+      .sort()
+      .reverse()
+      .filter((k) => {
+        const d = allData.days[k];
+        return k < selectedDate && d.tier === 'trained' && (d.exercises?.length ?? 0) > 0;
+      });
+
+    const wd = weekdayIndex(selectedDate);
+    const sameWeekday = before.find((k) => weekdayIndex(k) === wd);
+    const mostRecent = before[0];
+
+    const opts = [];
+    const seen = new Set();
+    const add = (key, title) => {
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      const ex = allData.days[key].exercises;
+      const n = `${ex.length} exercise${ex.length === 1 ? '' : 's'}`;
+      opts.push({ title, detail: n, exercises: ex });
+    };
+
+    if (sameWeekday) {
+      const weeks = Math.max(
+        1,
+        Math.round((parseKey(selectedDate) - parseKey(sameWeekday)) / 6.048e8),
+      );
+      add(
+        sameWeekday,
+        weeks === 1
+          ? `Same as last ${weekdayName(sameWeekday)}`
+          : `Last ${weekdayName(sameWeekday)} (${weeks}w ago)`,
+      );
     }
-    return null;
+    add(mostRecent, 'Repeat last session');
+    return opts;
   }, [allData, selectedDate]);
+
+  const presets = prefs.presets ?? [];
+  const savePreset = (name, exercises) =>
+    setPref('presets', [...presets, { id: newId(), name, exercises }]);
+  const deletePreset = (id) =>
+    setPref('presets', presets.filter((p) => p.id !== id));
 
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
@@ -209,7 +246,10 @@ export default function App() {
             dateLabel={weekdayName(selectedDate)}
             exercises={day.exercises}
             suggestions={exerciseNames}
-            lastSession={lastSession}
+            fillOptions={fillOptions}
+            presets={presets}
+            onSavePreset={savePreset}
+            onDeletePreset={deletePreset}
             onChange={(exercises) => setExercises(selectedDate, exercises)}
             onBack={() => setView('home')}
           />
