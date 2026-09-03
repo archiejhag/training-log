@@ -146,8 +146,8 @@ export default function CheckIn({
           className="note-input"
           type="text"
           maxLength={140}
-          placeholder="A note — tweaked knee, travelling…"
-          aria-label="Note for this day"
+          placeholder="Notes"
+          aria-label="Notes for this day"
           value={day.note ?? ''}
           onChange={(e) => onNote(e.target.value)}
         />
