@@ -1450,9 +1450,86 @@
 }
 
 .saved-msg {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   font-size: 12px;
   color: var(--rest);
+}
+
+/* inline "name this preset" field (replaces a browser prompt) */
+.preset-name-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.preset-name-input {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 9px 10px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+}
+
+.preset-name-input:focus {
+  outline: none;
+  border-color: rgba(201, 154, 74, 0.55);
+}
+
+.preset-name-save {
+  appearance: none;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 3px;
+  background: var(--amber);
+  color: var(--on-accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 14px;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.preset-name-save:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.preset-name-save:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.preset-name-cancel {
+  appearance: none;
+  flex-shrink: 0;
+  width: 36px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.preset-name-cancel:hover {
+  color: var(--chalk);
+  background: var(--hairline);
+}
+
+.preset-name-save:focus-visible,
+.preset-name-cancel:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
 }
 
 .done-btn {

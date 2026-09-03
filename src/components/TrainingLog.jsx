@@ -48,7 +48,11 @@ export default function TrainingLog({
   onBack,
 }) {
   const [showPresets, setShowPresets] = useState(false);
+  const [naming, setNaming] = useState(false);
+  const [presetName, setPresetName] = useState('');
   const [saved, setSaved] = useState(null);
+
+  const hasContent = exercises.some((x) => !isBlank(x));
 
   const update = (id, next) =>
     onChange(exercises.map((x) => (x.id === id ? next : x)));
@@ -60,13 +64,17 @@ export default function TrainingLog({
     onBack();
   };
 
-  const saveAsPreset = () => {
-    const template = toTemplate(exercises);
-    if (template.length === 0) return;
-    const name = window.prompt('Name this preset (e.g. Push day)');
-    if (!name?.trim()) return;
-    onSavePreset(name.trim(), template);
-    setSaved(name.trim());
+  const cancelNaming = () => {
+    setNaming(false);
+    setPresetName('');
+  };
+
+  const commitPreset = () => {
+    const name = presetName.trim();
+    if (!name) return;
+    onSavePreset(name, toTemplate(exercises));
+    cancelNaming();
+    setSaved(name);
     window.setTimeout(() => setSaved(null), 2500);
   };
 
@@ -171,9 +179,50 @@ export default function TrainingLog({
             <button type="button" className="add-exercise" onClick={add}>
               + Add exercise
             </button>
-            <button type="button" className="link-btn" onClick={saveAsPreset}>
-              Save these as a preset
-            </button>
+
+            {hasContent && !naming && !saved && (
+              <button
+                type="button"
+                className="link-btn"
+                onClick={() => setNaming(true)}
+              >
+                Save these as a preset
+              </button>
+            )}
+
+            {naming && (
+              <div className="preset-name-row">
+                <input
+                  className="preset-name-input"
+                  autoFocus
+                  placeholder="Name this preset (e.g. Push day)"
+                  aria-label="Preset name"
+                  value={presetName}
+                  onChange={(e) => setPresetName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') commitPreset();
+                    else if (e.key === 'Escape') cancelNaming();
+                  }}
+                />
+                <button
+                  type="button"
+                  className="preset-name-save"
+                  onClick={commitPreset}
+                  disabled={!presetName.trim()}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="preset-name-cancel"
+                  aria-label="Cancel"
+                  onClick={cancelNaming}
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
             {saved && (
               <p className="saved-msg" role="status">
                 Saved as “{saved}”
