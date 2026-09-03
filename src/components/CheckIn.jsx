@@ -1,3 +1,5 @@
+import { summariseExercise } from '../lib/format';
+
 /* The "Mark today" card. Three equal-weight tiers, an optional reason when
    you skip, and — only when you've marked Trained — a gentle nudge toward
    the training-log screen that you're free to ignore. */
@@ -21,14 +23,6 @@ const TYPES = [
   { id: 'cardio', label: 'Cardio' },
   { id: 'mobility', label: 'Mobility' },
 ];
-
-// "5×5 · 80" from an exercise's freeform fields; skips whatever's blank
-function summarise(ex) {
-  const setsReps = [ex.sets, ex.reps].filter((v) => v?.trim()).join('×');
-  const weight = ex.weight?.trim();
-  if (setsReps && weight) return `${setsReps} · ${weight}`;
-  return setsReps || weight || '';
-}
 
 export default function CheckIn({
   day,
@@ -115,7 +109,7 @@ export default function CheckIn({
               {day.exercises.map((ex) => (
                 <li key={ex.id}>
                   <span className="summary-name">{ex.name || 'Exercise'}</span>
-                  <span className="summary-metric">{summarise(ex)}</span>
+                  <span className="summary-metric">{summariseExercise(ex)}</span>
                 </li>
               ))}
             </ul>

@@ -22,18 +22,43 @@ function cloneExercises(list) {
     sets: x.sets ?? '',
     reps: x.reps ?? '',
     weight: x.weight ?? '',
+    ...(x.setList?.length
+      ? {
+          setList: x.setList.map((s) => ({
+            id: newId(),
+            reps: s.reps ?? '',
+            weight: s.weight ?? '',
+          })),
+        }
+      : {}),
   }));
 }
 
 function isBlank(x) {
-  return !x.name.trim() && !x.sets.trim() && !x.reps.trim() && !x.weight.trim();
+  const flatBlank =
+    !(x.name ?? '').trim() &&
+    !(x.sets ?? '').trim() &&
+    !(x.reps ?? '').trim() &&
+    !(x.weight ?? '').trim();
+  const setsBlank =
+    !x.setList?.length ||
+    x.setList.every(
+      (s) => !(s.reps ?? '').trim() && !(s.weight ?? '').trim(),
+    );
+  return flatBlank && setsBlank;
 }
 
 // preset templates carry no ids and no blank rows
 function toTemplate(list) {
-  return list
-    .filter((x) => !isBlank(x))
-    .map(({ name, sets, reps, weight }) => ({ name, sets, reps, weight }));
+  return list.filter((x) => !isBlank(x)).map(({ name, sets, reps, weight, setList }) => ({
+    name,
+    sets,
+    reps,
+    weight,
+    ...(setList?.length
+      ? { setList: setList.map(({ reps, weight }) => ({ reps, weight })) }
+      : {}),
+  }));
 }
 
 export default function TrainingLog({

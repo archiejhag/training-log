@@ -1370,6 +1370,133 @@
   gap: 8px;
 }
 
+/* per-set mode: one row per set */
+.perset {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.perset-row {
+  display: grid;
+  grid-template-columns: 42px 1fr 1fr 28px;
+  gap: 6px;
+  align-items: center;
+}
+
+.perset-head {
+  display: grid;
+  grid-template-columns: 42px 1fr 1fr 28px;
+  gap: 6px;
+}
+
+.perset-head span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  opacity: 0.75;
+}
+
+.perset-head span:nth-child(2),
+.perset-head span:nth-child(3) {
+  padding-left: 8px;
+}
+
+.perset-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+}
+
+.perset-in {
+  width: 100%;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 7px 8px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.perset-in::placeholder {
+  color: var(--chalk-dim);
+  opacity: 0.7;
+}
+
+.perset-in:focus {
+  border-color: rgba(201, 154, 74, 0.55);
+}
+
+.perset-del {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-size: 15px;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.perset-del:hover {
+  color: var(--chalk);
+  background: var(--hairline);
+}
+
+.perset-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.perset-add,
+.perset-toggle {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.perset-add:hover:not(:disabled),
+.perset-toggle:hover {
+  color: var(--chalk);
+}
+
+.perset-add:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.exercise-fields + .perset-toggle {
+  margin-top: 8px;
+}
+
+.perset-add:focus-visible,
+.perset-toggle:focus-visible,
+.perset-del:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
 .field {
   display: flex;
   flex-direction: column;
