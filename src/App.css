@@ -603,7 +603,54 @@
   outline-offset: 1px;
 }
 
-/* ---- Check-in: "note what you did?" prompt (only when Trained) -- */
+/* ---- Check-in: logged session summary / "note what you did?" prompt -- */
+
+/* read-only glance at what was logged — so you don't open the editor
+   just to read last week's numbers */
+.session-summary {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  animation: fadeIn 0.2s ease;
+}
+
+.summary-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+}
+
+.summary-name {
+  color: var(--chalk);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-metric {
+  flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  color: var(--chalk-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-edit {
+  display: block;
+  margin-left: auto;
+}
 
 .log-prompt {
   margin-top: 14px;

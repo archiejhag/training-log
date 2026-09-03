@@ -22,6 +22,14 @@ const TYPES = [
   { id: 'mobility', label: 'Mobility' },
 ];
 
+// "5×5 · 80" from an exercise's freeform fields; skips whatever's blank
+function summarise(ex) {
+  const setsReps = [ex.sets, ex.reps].filter((v) => v?.trim()).join('×');
+  const weight = ex.weight?.trim();
+  if (setsReps && weight) return `${setsReps} · ${weight}`;
+  return setsReps || weight || '';
+}
+
 export default function CheckIn({
   day,
   isToday,
@@ -99,21 +107,38 @@ export default function CheckIn({
         </div>
       )}
 
-      {day.tier === 'trained' && (
-        <div className="log-prompt">
-          <div>
-            <p className="log-prompt-title">Nice. Want to note what you did?</p>
-            <p className="log-prompt-sub">
-              {count > 0
-                ? `${count} exercise${count > 1 ? 's' : ''} logged`
-                : 'Totally optional — skip it if you like.'}
-            </p>
+      {day.tier === 'trained' &&
+        (count > 0 ? (
+          <div className="session-summary">
+            <ul className="summary-list">
+              {day.exercises.map((ex) => (
+                <li key={ex.id}>
+                  <span className="summary-name">{ex.name || 'Exercise'}</span>
+                  <span className="summary-metric">{summarise(ex)}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              className="ghost-btn summary-edit"
+              onClick={onOpenLog}
+            >
+              Edit
+            </button>
           </div>
-          <button type="button" className="ghost-btn" onClick={onOpenLog}>
-            {count > 0 ? 'Edit' : 'Add details'}
-          </button>
-        </div>
-      )}
+        ) : (
+          <div className="log-prompt">
+            <div>
+              <p className="log-prompt-title">Nice. Want to note what you did?</p>
+              <p className="log-prompt-sub">
+                Totally optional — skip it if you like.
+              </p>
+            </div>
+            <button type="button" className="ghost-btn" onClick={onOpenLog}>
+              Add details
+            </button>
+          </div>
+        ))}
     </section>
   );
 }
