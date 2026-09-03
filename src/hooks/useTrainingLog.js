@@ -7,9 +7,11 @@ import { useState, useEffect, useCallback } from 'react';
 
    Stored shape:
      {
-       days:  { "YYYY-MM-DD": { tier, reason, exercises } },
+       days:  { "YYYY-MM-DD": { tier, reason, type, exercises } },
        prefs: { catchUpDismissedFor?, ... }   // app-wide settings, grows over time
      }
+   (`type` — push/pull/legs/cardio/mobility — is optional and only meaningful
+   on a Trained day.)
 */
 
 const STORAGE_KEY = 'training-log/v1';
@@ -18,7 +20,7 @@ const EMPTY = { days: {}, prefs: {} };
 
 /** The default record for a day nobody has marked yet. */
 export function blankDay() {
-  return { tier: null, reason: null, exercises: [] };
+  return { tier: null, reason: null, type: null, exercises: [] };
 }
 
 function load() {
@@ -74,8 +76,9 @@ export function useTrainingLog() {
       const next = current.tier === tier ? null : tier;
       patchDay(key, {
         tier: next,
-        // A reason only belongs to a "skipped" day.
+        // A reason only belongs to a "skipped" day; a type to a "trained" one.
         reason: next === 'skipped' ? current.reason : null,
+        type: next === 'trained' ? current.type ?? null : null,
       });
     },
     [data, patchDay],
@@ -83,6 +86,11 @@ export function useTrainingLog() {
 
   const setReason = useCallback(
     (key, reason) => patchDay(key, { reason }),
+    [patchDay],
+  );
+
+  const setType = useCallback(
+    (key, type) => patchDay(key, { type }),
     [patchDay],
   );
 
@@ -111,6 +119,7 @@ export function useTrainingLog() {
     getDay,
     setTier,
     setReason,
+    setType,
     setExercises,
     prefs: data.prefs,
     setPref,

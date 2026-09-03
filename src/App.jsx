@@ -27,8 +27,17 @@ import Settings from './components/Settings';
 export default function App() {
   const today = todayKey();
   const yesterday = yesterdayKey();
-  const { getDay, setTier, setReason, setExercises, prefs, setPref, allData, replaceAll } =
-    useTrainingLog();
+  const {
+    getDay,
+    setTier,
+    setReason,
+    setType,
+    setExercises,
+    prefs,
+    setPref,
+    allData,
+    replaceAll,
+  } = useTrainingLog();
 
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
@@ -206,6 +215,7 @@ export default function App() {
               dateLabel={weekdayName(selectedDate)}
               onTier={(tier) => setTier(selectedDate, tier)}
               onReason={(reason) => setReason(selectedDate, reason)}
+              onType={(type) => setType(selectedDate, type)}
               onOpenLog={() => setView('log')}
             />
 

@@ -14,7 +14,23 @@ const REASONS = [
   { id: 'other', label: 'Other' },
 ];
 
-export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onOpenLog }) {
+const TYPES = [
+  { id: 'push', label: 'Push' },
+  { id: 'pull', label: 'Pull' },
+  { id: 'legs', label: 'Legs' },
+  { id: 'cardio', label: 'Cardio' },
+  { id: 'mobility', label: 'Mobility' },
+];
+
+export default function CheckIn({
+  day,
+  isToday,
+  dateLabel,
+  onTier,
+  onReason,
+  onType,
+  onOpenLog,
+}) {
   const count = day.exercises.length;
 
   return (
@@ -58,6 +74,25 @@ export default function CheckIn({ day, isToday, dateLabel, onTier, onReason, onO
                 onClick={() => onReason(day.reason === r.id ? null : r.id)}
               >
                 {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {day.tier === 'trained' && (
+        <div className="type-block">
+          <p className="prompt">Session type — optional</p>
+          <div className="type-chips" role="group" aria-label="Session type">
+            {TYPES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={'type-chip' + (day.type === t.id ? ' selected' : '')}
+                aria-pressed={day.type === t.id}
+                onClick={() => onType(day.type === t.id ? null : t.id)}
+              >
+                {t.label}
               </button>
             ))}
           </div>

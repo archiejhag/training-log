@@ -71,12 +71,32 @@ describe('setTier', () => {
     expect(result.current.getDay('d').exercises).toEqual(ex);
   });
 
+  test('the session type is dropped when a day stops being trained', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'trained'));
+    act(() => result.current.setType('d', 'push'));
+    expect(result.current.getDay('d').type).toBe('push');
+    act(() => result.current.setTier('d', 'rest'));
+    expect(result.current.getDay('d').type).toBe(null);
+  });
+
   test('marking one day leaves another alone', () => {
     const { result } = renderHook(() => useTrainingLog());
     act(() => result.current.setTier('a', 'trained'));
     act(() => result.current.setTier('b', 'skipped'));
     expect(result.current.getDay('a').tier).toBe('trained');
     expect(result.current.getDay('b').tier).toBe('skipped');
+  });
+});
+
+describe('setType', () => {
+  test('sets and toggles the session type', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'trained'));
+    act(() => result.current.setType('d', 'pull'));
+    expect(result.current.getDay('d').type).toBe('pull');
+    act(() => result.current.setType('d', null));
+    expect(result.current.getDay('d').type).toBe(null);
   });
 });
 
