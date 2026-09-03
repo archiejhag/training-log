@@ -61,6 +61,30 @@ export default function App() {
 
   return (
     <div className="phone">
+      {/* Defined once, referenced by every .stroke / .mark via
+          `filter: url(#chalk-edge)`. Turbulence makes noise; the
+          displacement map uses that noise to nudge the shape's edge
+          pixels around, turning a crisp box into a frayed chalk mark. */}
+      <svg className="svg-defs" aria-hidden="true" focusable="false">
+        <filter id="chalk-edge" x="-40%" y="-40%" width="180%" height="180%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.55"
+            numOctaves="1"
+            seed="7"
+            stitchTiles="stitch"
+            result="noise"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="1"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+
       <main className="app">
         {view === 'home' ? (
           <>

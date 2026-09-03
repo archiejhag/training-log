@@ -39,6 +39,15 @@
   }
 }
 
+/* holds the SVG filter defs — kept in the DOM (not display:none, which
+   stops Firefox applying the filter) but out of the layout */
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 /* ---- Phone-shaped shell ---------------------------------------------- */
 
 .phone {
@@ -384,8 +393,13 @@
   height: 3px;
   border-radius: 2px;
   margin-bottom: 12px;
+  filter: url(#chalk-edge);
   transition: all 0.15s ease;
 }
+
+.tiers .tier-btn:nth-child(1) .mark { transform: rotate(-1deg); }
+.tiers .tier-btn:nth-child(2) .mark { transform: rotate(0.8deg); }
+.tiers .tier-btn:nth-child(3) .mark { transform: rotate(-0.6deg); }
 
 .tier-btn[data-tier='trained'] .mark {
   background: var(--amber);
@@ -658,10 +672,21 @@
   border-radius: 3px;
   background: var(--hairline-strong);
   height: 3px;
+  filter: url(#chalk-edge);
+  transform-origin: bottom center;
   transition:
     height 0.3s ease,
     background 0.3s ease;
 }
+
+/* a degree or two of lean per column — a hand, not a ruler */
+.strip .day-col:nth-child(1) .stroke { transform: rotate(-1.6deg); }
+.strip .day-col:nth-child(2) .stroke { transform: rotate(1deg); }
+.strip .day-col:nth-child(3) .stroke { transform: rotate(-0.5deg); }
+.strip .day-col:nth-child(4) .stroke { transform: rotate(1.4deg); }
+.strip .day-col:nth-child(5) .stroke { transform: rotate(-1.1deg); }
+.strip .day-col:nth-child(6) .stroke { transform: rotate(0.6deg); }
+.strip .day-col:nth-child(7) .stroke { transform: rotate(-1.3deg); }
 
 .day-col[data-tier='trained'] .stroke {
   background: var(--amber);
