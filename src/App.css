@@ -311,10 +311,18 @@
   background: var(--amber);
 }
 .catch-up-tier[data-tier='skipped']::before {
-  background: var(--skip);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--skip) 0 3px,
+    transparent 3px 5px
+  );
 }
 .catch-up-tier[data-tier='rest']::before {
-  background: var(--rest);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--rest) 0 1.5px,
+    transparent 1.5px 3px
+  );
 }
 
 .catch-up-tier:hover {
@@ -406,14 +414,23 @@
 .tiers .tier-btn:nth-child(2) .mark { transform: rotate(0.8deg); }
 .tiers .tier-btn:nth-child(3) .mark { transform: rotate(-0.6deg); }
 
+/* same solid / dashed / dotted language as the strip strokes */
 .tier-btn[data-tier='trained'] .mark {
   background: var(--amber);
 }
 .tier-btn[data-tier='skipped'] .mark {
-  background: var(--skip);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--skip) 0 4px,
+    transparent 4px 7px
+  );
 }
 .tier-btn[data-tier='rest'] .mark {
-  background: var(--rest);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--rest) 0 2px,
+    transparent 2px 4.5px
+  );
 }
 
 .tier-btn .label {
@@ -778,18 +795,29 @@
 .strip .day-col:nth-child(6) .stroke { --lean: 0.6deg; }
 .strip .day-col:nth-child(7) .stroke { --lean: -1.3deg; }
 
+/* Each tier also carries a texture, so the state survives colour-blindness
+   and a washed-out screen: trained = solid, skipped = dashed,
+   rest = dotted. (currentColor stays set for the dust.) */
 .day-col[data-tier='trained'] .stroke {
   background: var(--amber);
   color: var(--amber);
   height: 34px;
 }
 .day-col[data-tier='skipped'] .stroke {
-  background: var(--skip);
+  background: repeating-linear-gradient(
+    180deg,
+    var(--skip) 0 6px,
+    transparent 6px 11px
+  );
   color: var(--skip);
   height: 34px;
 }
 .day-col[data-tier='rest'] .stroke {
-  background: var(--rest);
+  background: repeating-linear-gradient(
+    180deg,
+    var(--rest) 0 2.5px,
+    transparent 2.5px 6px
+  );
   color: var(--rest);
   height: 34px;
 }
