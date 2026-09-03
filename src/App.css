@@ -663,6 +663,36 @@
   animation: fadeIn 0.2s ease;
 }
 
+/* one freeform line for the day — any tier, or none */
+.note-block {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.note-input {
+  width: 100%;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 9px 10px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.note-input::placeholder {
+  color: var(--chalk-dim);
+  opacity: 0.85;
+}
+
+.note-input:focus {
+  outline: none;
+  border-color: rgba(201, 154, 74, 0.55);
+}
+
 .log-prompt-title {
   font-size: 12.5px;
   color: var(--chalk);

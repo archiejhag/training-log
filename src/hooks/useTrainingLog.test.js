@@ -100,6 +100,18 @@ describe('setType', () => {
   });
 });
 
+describe('setNote', () => {
+  test('sets a note and it survives a tier change', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setNote('d', 'tweaked knee'));
+    expect(result.current.getDay('d').note).toBe('tweaked knee');
+    act(() => result.current.setTier('d', 'rest'));
+    expect(result.current.getDay('d').note).toBe('tweaked knee');
+    act(() => result.current.setTier('d', 'trained'));
+    expect(result.current.getDay('d').note).toBe('tweaked knee');
+  });
+});
+
 describe('setPref', () => {
   test('merges rather than replacing', () => {
     const { result } = renderHook(() => useTrainingLog());

@@ -32,6 +32,7 @@ export default function App() {
     setTier,
     setReason,
     setType,
+    setNote,
     setExercises,
     prefs,
     setPref,
@@ -216,6 +217,7 @@ export default function App() {
               onTier={(tier) => setTier(selectedDate, tier)}
               onReason={(reason) => setReason(selectedDate, reason)}
               onType={(type) => setType(selectedDate, type)}
+              onNote={(note) => setNote(selectedDate, note)}
               onOpenLog={() => setView('log')}
             />
 

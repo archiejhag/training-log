@@ -37,6 +37,7 @@ export default function CheckIn({
   onTier,
   onReason,
   onType,
+  onNote,
   onOpenLog,
 }) {
   const count = day.exercises.length;
@@ -139,6 +140,18 @@ export default function CheckIn({
             </button>
           </div>
         ))}
+
+      <div className="note-block">
+        <input
+          className="note-input"
+          type="text"
+          maxLength={140}
+          placeholder="A note — tweaked knee, travelling…"
+          aria-label="Note for this day"
+          value={day.note ?? ''}
+          onChange={(e) => onNote(e.target.value)}
+        />
+      </div>
     </section>
   );
 }
