@@ -181,7 +181,11 @@ export default function WeeklyView({
         />
       </div>
 
-      <p className="footnote">Tap any day to fill it in. Every mark stands on its own.</p>
+      <p className="footnote">
+        {marked === 0
+          ? 'Tap any day to fill it in. A blank week is just a blank week — nothing to make up.'
+          : 'Tap any day to fill it in. Every mark stands on its own.'}
+      </p>
     </section>
   );
 }

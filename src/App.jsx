@@ -35,8 +35,13 @@ export default function App() {
   const day = getDay(selectedDate);
   const isToday = selectedDate === today;
 
+  // Don't nag a brand-new user about "yesterday" — only offer catch-up once
+  // there's some history to catch up to.
+  const hasHistory = Object.keys(allData.days).length > 0;
   const showCatchUp =
-    getDay(yesterday).tier == null && prefs.catchUpDismissedFor !== yesterday;
+    hasHistory &&
+    getDay(yesterday).tier == null &&
+    prefs.catchUpDismissedFor !== yesterday;
 
   const goToToday = () => {
     setSelectedDate(today);

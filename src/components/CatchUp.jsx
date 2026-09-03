@@ -41,7 +41,7 @@ export default function CatchUp({ dateLabel, onMark, onSkip, onDismiss }) {
       {phase === 'ask' ? (
         <>
           <p className="catch-up-text">
-            Yesterday ({dateLabel}) never got marked.
+            Yesterday ({dateLabel}) is still blank.
           </p>
           <div className="catch-up-tiers">
             {TIERS.map((t) => (

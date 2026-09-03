@@ -71,7 +71,7 @@ export default function TrainingLog({ dateLabel, exercises, onChange, onBack }) 
       </section>
 
       <p className="footnote">
-        Nothing here is required. Today is already marked <b>Trained</b>.
+        Nothing here is required — the day already counts as <b>Trained</b>.
       </p>
 
       <button type="button" className="done-btn" onClick={finish}>

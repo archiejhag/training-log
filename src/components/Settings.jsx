@@ -74,12 +74,18 @@ export default function Settings({ allData, onImport, onBack }) {
       <section className="card">
         <h2>Your data</h2>
         <p className="sub">
-          Everything lives in this browser. Export a copy to back it up, or to
-          move it to another device.
+          {dayCount === 0
+            ? "Everything lives in this browser. Once you've marked a few days, export a copy to keep it safe or carry it to another device."
+            : 'Everything lives in this browser. Export a copy to back it up, or to move it to another device.'}
         </p>
 
         <div className="settings-actions">
-          <button type="button" className="ghost-btn" onClick={handleExport}>
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={handleExport}
+            disabled={dayCount === 0}
+          >
             Export ({dayCount} {plural(dayCount)})
           </button>
           <button
