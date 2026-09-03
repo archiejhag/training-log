@@ -133,6 +133,7 @@ export default function App() {
               today={today}
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
+              onErase={() => setTier(selectedDate, null)}
             />
           </>
         ) : view === 'settings' ? (

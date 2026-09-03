@@ -25,9 +25,15 @@ export default function WeeklyView({
   today,
   selectedDate,
   onSelectDate,
+  onErase,
 }) {
   const marked = week.filter((key) => getDay(key).tier).length;
   const stripRef = useRef(null);
+
+  // The eraser only works on a marked day that's actually on screen.
+  const canErase = week.includes(selectedDate) && getDay(selectedDate).tier != null;
+  // Tint the chalk stub to whatever the selected day is marked as.
+  const nubTier = getDay(selectedDate).tier ?? 'none';
 
   // --- draw-on / erase pulse ---------------------------------------
   // When a visible day's tier changes, tag that column 'in' (just marked)
@@ -163,7 +169,18 @@ export default function WeeklyView({
         })}
       </div>
 
-      <div className="hairline-rule" />
+      <div className="board-tray">
+        <span className="chalk-nub" data-tier={nubTier} aria-hidden="true" />
+        <button
+          type="button"
+          className="eraser"
+          onClick={onErase}
+          disabled={!canErase}
+          title={canErase ? `Erase ${weekdayName(selectedDate)}` : 'Nothing to erase'}
+          aria-label={canErase ? `Erase ${weekdayName(selectedDate)}` : 'Nothing to erase'}
+        />
+      </div>
+
       <p className="footnote">Tap any day to fill it in. Every mark stands on its own.</p>
     </section>
   );

@@ -16,6 +16,11 @@
   --rest: #8fa089;
   --hairline: rgba(237, 236, 230, 0.1);
   --hairline-strong: rgba(237, 236, 230, 0.18);
+
+  /* the chalk rail beneath the weekly strip — a warm wood, not slate */
+  --tray: #3b332b;
+  --tray-lip: #4e4438;
+  --tray-base: #2f2922;
 }
 
 /* ---- Accessibility baseline ---------------------------------------- */
@@ -816,6 +821,86 @@
 .day-col.is-today .day-label {
   color: var(--chalk);
   border-color: rgba(201, 154, 74, 0.75);
+}
+
+/* ---- Board furniture: the chalk rail ------------------------- */
+
+.board-tray {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 18px;
+  margin: 14px -12px 12px;
+  padding: 0 14px;
+  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--tray-lip),
+    var(--tray) 45%,
+    var(--tray-base)
+  );
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 6px 12px -7px rgba(0, 0, 0, 0.5);
+}
+
+/* a stub of chalk lying in the rail — tinted to the selected day */
+.chalk-nub {
+  flex-shrink: 0;
+  width: 22px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--chalk);
+  transform: rotate(-5deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.chalk-nub[data-tier='trained'] {
+  background: var(--amber);
+}
+.chalk-nub[data-tier='skipped'] {
+  background: var(--skip);
+}
+.chalk-nub[data-tier='rest'] {
+  background: var(--rest);
+}
+
+/* felt eraser — wood top, felt bottom. This is the clear control. */
+.eraser {
+  appearance: none;
+  border: none;
+  flex-shrink: 0;
+  width: 42px;
+  height: 15px;
+  padding: 0;
+  border-radius: 2px 2px 3px 3px;
+  background: linear-gradient(180deg, #756f66 0 34%, #48433d 34% 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 2px 3px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    filter 0.1s ease;
+}
+
+.eraser:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.eraser:active:not(:disabled) {
+  transform: translateY(1px) scaleX(0.96);
+}
+
+.eraser:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.eraser:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
 }
 
 /* ---- Training-log detail screen --------------------------- */
