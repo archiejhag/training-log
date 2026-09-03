@@ -1161,9 +1161,15 @@
   margin-bottom: 10px;
 }
 
-.exercise-name {
+/* autocomplete wrapper — anchors the suggestion list to the input */
+.ac {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+.exercise-name {
+  width: 100%;
   appearance: none;
   background: var(--field);
   border: 1px solid var(--hairline-strong);
@@ -1173,6 +1179,37 @@
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 14px;
   transition: border-color 0.15s ease;
+}
+
+.ac-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.55);
+  max-height: 176px;
+  overflow-y: auto;
+}
+
+.ac-item {
+  padding: 8px 10px;
+  border-radius: 2px;
+  font-size: 13px;
+  color: var(--chalk-dim);
+  cursor: pointer;
+}
+
+.ac-item.is-hi,
+.ac-item:hover {
+  background: var(--panel-raised);
+  color: var(--chalk);
 }
 
 .remove-btn {

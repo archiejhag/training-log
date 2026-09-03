@@ -18,7 +18,13 @@ function isBlank(x) {
   return !x.name.trim() && !x.sets.trim() && !x.reps.trim() && !x.weight.trim();
 }
 
-export default function TrainingLog({ dateLabel, exercises, onChange, onBack }) {
+export default function TrainingLog({
+  dateLabel,
+  exercises,
+  suggestions = [],
+  onChange,
+  onBack,
+}) {
   const update = (id, next) =>
     onChange(exercises.map((x) => (x.id === id ? next : x)));
 
@@ -58,6 +64,7 @@ export default function TrainingLog({ dateLabel, exercises, onChange, onBack }) 
                 <ExerciseRow
                   key={x.id}
                   exercise={x}
+                  suggestions={suggestions}
                   onChange={(next) => update(x.id, next)}
                   onRemove={() => remove(x.id)}
                 />

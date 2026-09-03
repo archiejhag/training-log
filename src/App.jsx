@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
 import {
@@ -46,6 +46,23 @@ export default function App() {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = prefs.theme === 'light' ? '#ecebe3' : '#2a2d2b';
   }, [prefs.theme]);
+
+  // Every exercise name used before, most-recently-used first, deduped
+  // case-insensitively (keeping the casing it was first typed in).
+  const exerciseNames = useMemo(() => {
+    const seen = new Set();
+    const names = [];
+    for (const key of Object.keys(allData.days).sort().reverse()) {
+      for (const ex of allData.days[key].exercises ?? []) {
+        const n = ex.name?.trim();
+        if (n && !seen.has(n.toLowerCase())) {
+          seen.add(n.toLowerCase());
+          names.push(n);
+        }
+      }
+    }
+    return names;
+  }, [allData]);
 
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
@@ -178,6 +195,7 @@ export default function App() {
           <TrainingLog
             dateLabel={weekdayName(selectedDate)}
             exercises={day.exercises}
+            suggestions={exerciseNames}
             onChange={(exercises) => setExercises(selectedDate, exercises)}
             onBack={() => setView('home')}
           />
