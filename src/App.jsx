@@ -11,6 +11,7 @@ import {
 import CatchUp from './components/CatchUp';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
+import MonthView from './components/MonthView';
 import TrainingLog from './components/TrainingLog';
 import Settings from './components/Settings';
 
@@ -30,6 +31,7 @@ export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
+  const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month'
 
   const week = weekKeysForOffset(weekOffset);
   const day = getDay(selectedDate);
@@ -130,16 +132,29 @@ export default function App() {
               onOpenLog={() => setView('log')}
             />
 
-            <WeeklyView
-              week={week}
-              weekOffset={weekOffset}
-              onWeekChange={changeWeek}
-              getDay={getDay}
-              today={today}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              onErase={() => setTier(selectedDate, null)}
-            />
+            {historyMode === 'week' ? (
+              <WeeklyView
+                week={week}
+                weekOffset={weekOffset}
+                onWeekChange={changeWeek}
+                getDay={getDay}
+                today={today}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onErase={() => setTier(selectedDate, null)}
+                historyMode={historyMode}
+                onHistoryMode={setHistoryMode}
+              />
+            ) : (
+              <MonthView
+                getDay={getDay}
+                today={today}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                historyMode={historyMode}
+                onHistoryMode={setHistoryMode}
+              />
+            )}
           </>
         ) : view === 'settings' ? (
           <Settings

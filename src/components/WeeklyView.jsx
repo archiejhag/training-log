@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { dayLetter, weekdayName, weekRangeLabel } from '../lib/date';
+import HistoryToggle from './HistoryToggle';
 
 /* The "This week" card. Seven equal chalk strokes — colour tells you the
    state, height never does. The count is "X / 7 marked", never a streak.
@@ -26,6 +27,8 @@ export default function WeeklyView({
   selectedDate,
   onSelectDate,
   onErase,
+  historyMode,
+  onHistoryMode,
 }) {
   const marked = week.filter((key) => getDay(key).tier).length;
   const stripRef = useRef(null);
@@ -104,6 +107,10 @@ export default function WeeklyView({
 
   return (
     <section className="card">
+      <div className="hist-top">
+        <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
+      </div>
+
       <div className="week-header">
         <div className="week-nav">
           <button

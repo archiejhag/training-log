@@ -70,6 +70,29 @@ export function weekdayName(key) {
   return parseKey(key).toLocaleDateString('en-US', { weekday: 'long' });
 }
 
+/** Every day-key in the calendar month `n` months from this one (n < 0 = past). */
+export function monthKeys(n) {
+  const ref = new Date();
+  ref.setDate(1);
+  ref.setMonth(ref.getMonth() + n);
+  const y = ref.getFullYear();
+  const m = ref.getMonth();
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  return Array.from({ length: lastDay }, (_, i) => toKey(new Date(y, m, i + 1)));
+}
+
+/** "September" — or "September 2025" when it isn't the current year. */
+export function monthLabel(n) {
+  const ref = new Date();
+  ref.setDate(1);
+  ref.setMonth(ref.getMonth() + n);
+  const sameYear = ref.getFullYear() === new Date().getFullYear();
+  return ref.toLocaleDateString(
+    'en-US',
+    sameYear ? { month: 'long' } : { month: 'long', year: 'numeric' },
+  );
+}
+
 /** ("2026-08-18", "2026-08-24") -> "18–24 Aug"  (or "28 Jul – 3 Aug"). */
 export function weekRangeLabel(startKey, endKey) {
   const start = parseKey(startKey);
