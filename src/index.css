@@ -15,8 +15,8 @@ body {
 
 body {
   min-height: 100vh;
-  background: #1c1e1c;
-  color: #edece6;
+  background: var(--outer, #1c1e1c);
+  color: var(--chalk, #edece6);
   font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -37,6 +37,6 @@ body {
 @media (max-width: 520px) {
   body {
     padding: 0;
-    background: #2a2d2b;
+    background: var(--bg, #2a2d2b);
   }
 }

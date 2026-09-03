@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
 import {
@@ -36,6 +36,16 @@ export default function App() {
   const week = weekKeysForOffset(weekOffset);
   const day = getDay(selectedDate);
   const isToday = selectedDate === today;
+
+  // Apply the saved theme. index.html already set it before paint; this keeps
+  // it in sync when the toggle changes.
+  useEffect(() => {
+    const el = document.documentElement;
+    if (prefs.theme === 'light') el.setAttribute('data-theme', 'light');
+    else el.removeAttribute('data-theme');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = prefs.theme === 'light' ? '#ecebe3' : '#2a2d2b';
+  }, [prefs.theme]);
 
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
@@ -160,6 +170,8 @@ export default function App() {
           <Settings
             allData={allData}
             onImport={replaceAll}
+            theme={prefs.theme === 'light' ? 'light' : 'dark'}
+            onTheme={(t) => setPref('theme', t)}
             onBack={() => setView('home')}
           />
         ) : (

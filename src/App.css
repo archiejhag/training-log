@@ -4,23 +4,56 @@
    training-log detail screen.
    ========================================================================= */
 
+/* Dark ("chalkboard") is the default. Light ("whiteboard") is the same
+   token set, re-valued under [data-theme='light']. Everything colour-y
+   references a token so the theme swap is total. */
 :root {
-  --bg: #2a2d2b;
+  --outer: #1c1e1c; /* the room, behind the board */
+  --bg: #2a2d2b; /* the board */
   --panel: #33362f;
   --panel-raised: #3b3e36;
+  --panel-selected: #40433a;
   --field: #2f322c;
-  --chalk: #edece6;
+  --chalk: #edece6; /* text / "chalk" */
   --chalk-dim: #a6a9a0;
   --amber: #c99a4a;
   --skip: #7c8b93;
   --rest: #8fa089;
+  --on-accent: #1c1e1c; /* text sitting on an amber / skip fill */
   --hairline: rgba(237, 236, 230, 0.1);
   --hairline-strong: rgba(237, 236, 230, 0.18);
+  --dust: #ffffff; /* the speckle over the board */
 
   /* the chalk rail beneath the weekly strip — a warm wood, not slate */
   --tray: #3b332b;
   --tray-lip: #4e4438;
   --tray-base: #2f2922;
+  --eraser-a: #756f66;
+  --eraser-b: #48433d;
+}
+
+:root[data-theme='light'] {
+  --outer: #dcd9d1;
+  --bg: #ecebe3;
+  --panel: #f3f1ea;
+  --panel-raised: #e4e1d6;
+  --panel-selected: #dbd6c6;
+  --field: #f6f4ec;
+  --chalk: #2c2d28;
+  --chalk-dim: #63645b;
+  --amber: #9d6a20;
+  --skip: #55636b;
+  --rest: #52704a;
+  --on-accent: #f6f4ec;
+  --hairline: rgba(28, 30, 26, 0.14);
+  --hairline-strong: rgba(28, 30, 26, 0.24);
+  --dust: #2c2d28;
+
+  --tray: #cabfa8;
+  --tray-lip: #dacfba;
+  --tray-base: #b4a98f;
+  --eraser-a: #928a7c;
+  --eraser-b: #5f584d;
 }
 
 /* ---- Accessibility baseline ---------------------------------------- */
@@ -73,9 +106,9 @@
   pointer-events: none;
   opacity: 0.05;
   background-image:
-    radial-gradient(circle at 20% 30%, #fff 0.5px, transparent 0.5px),
-    radial-gradient(circle at 70% 60%, #fff 0.5px, transparent 0.5px),
-    radial-gradient(circle at 40% 80%, #fff 0.5px, transparent 0.5px);
+    radial-gradient(circle at 20% 30%, var(--dust) 0.5px, transparent 0.5px),
+    radial-gradient(circle at 70% 60%, var(--dust) 0.5px, transparent 0.5px),
+    radial-gradient(circle at 40% 80%, var(--dust) 0.5px, transparent 0.5px);
   background-size: 3px 3px, 4px 4px, 5px 5px;
   z-index: 2;
 }
@@ -451,7 +484,7 @@
 }
 
 .tier-btn.selected {
-  background: #40433a;
+  background: var(--panel-selected);
 }
 
 .tier-btn[data-tier='trained'].selected {
@@ -517,7 +550,7 @@
 .reason-chip.selected {
   background: var(--skip);
   border-color: var(--skip);
-  color: #1c1e1c;
+  color: var(--on-accent);
 }
 
 /* ---- Check-in: "note what you did?" prompt (only when Trained) -- */
@@ -908,7 +941,11 @@
   height: 15px;
   padding: 0;
   border-radius: 2px 2px 3px 3px;
-  background: linear-gradient(180deg, #756f66 0 34%, #48433d 34% 100%);
+  background: linear-gradient(
+    180deg,
+    var(--eraser-a) 0 34%,
+    var(--eraser-b) 34% 100%
+  );
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.08) inset,
     0 2px 3px rgba(0, 0, 0, 0.45);
@@ -1255,7 +1292,7 @@
   width: 100%;
   border: none;
   background: var(--amber);
-  color: #1c1e1c;
+  color: var(--on-accent);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   font-weight: 500;

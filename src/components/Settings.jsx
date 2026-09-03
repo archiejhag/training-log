@@ -11,7 +11,7 @@ function plural(n) {
   return n === 1 ? 'day' : 'days';
 }
 
-export default function Settings({ allData, onImport, onBack }) {
+export default function Settings({ allData, onImport, theme, onTheme, onBack }) {
   const fileRef = useRef(null);
   const backRef = useRef(null);
   const [msg, setMsg] = useState(null); // { kind: 'ok' | 'err', text }
@@ -112,6 +112,27 @@ export default function Settings({ allData, onImport, onBack }) {
             {msg.text}
           </p>
         )}
+      </section>
+
+      <section className="card">
+        <h2>Appearance</h2>
+        <p className="sub">Chalk on slate, or ink on a whiteboard.</p>
+        <div className="hist-toggle" role="group" aria-label="Theme">
+          {[
+            ['dark', 'Chalkboard'],
+            ['light', 'Whiteboard'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={theme === value ? 'is-on' : undefined}
+              aria-pressed={theme === value}
+              onClick={() => onTheme(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </section>
 
       <p className="footnote">
