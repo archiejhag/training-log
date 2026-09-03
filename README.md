@@ -47,7 +47,8 @@ npm run dev
 ```
 
 Then open the printed `localhost` URL. `npm run build` outputs static files to
-`dist/`.
+`dist/`. `npm test` runs the Vitest suite (the date helpers and the
+`useTrainingLog` reducer).
 
 ## Stack
 

@@ -1,0 +1,133 @@
+import { describe, test, expect, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useTrainingLog, blankDay } from './useTrainingLog';
+
+const STORAGE_KEY = 'training-log/v1';
+const stored = () => JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+beforeEach(() => localStorage.clear());
+
+describe('load / initial state', () => {
+  test('a fresh install has empty days and prefs', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    expect(result.current.getDay('2026-09-03')).toEqual(blankDay());
+    expect(result.current.prefs).toEqual({});
+  });
+
+  test('data saved before `prefs` existed still loads', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ days: { '2026-09-01': { tier: 'trained', reason: null, exercises: [] } } }),
+    );
+    const { result } = renderHook(() => useTrainingLog());
+    expect(result.current.getDay('2026-09-01').tier).toBe('trained');
+    expect(result.current.prefs).toEqual({});
+  });
+
+  test('invalid JSON falls back to empty', () => {
+    localStorage.setItem(STORAGE_KEY, 'not json {{');
+    const { result } = renderHook(() => useTrainingLog());
+    expect(result.current.getDay('x')).toEqual(blankDay());
+  });
+
+  test('a value of the wrong shape falls back to empty', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ nope: 1 }));
+    const { result } = renderHook(() => useTrainingLog());
+    expect(result.current.getDay('x')).toEqual(blankDay());
+  });
+});
+
+describe('setTier', () => {
+  test('marks a day, and tapping the same tier again clears it', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'trained'));
+    expect(result.current.getDay('d').tier).toBe('trained');
+    act(() => result.current.setTier('d', 'trained'));
+    expect(result.current.getDay('d').tier).toBe(null);
+  });
+
+  test('setTier(key, null) clears — the eraser path', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'rest'));
+    act(() => result.current.setTier('d', null));
+    expect(result.current.getDay('d').tier).toBe(null);
+  });
+
+  test('leaving "skipped" drops the reason', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'skipped'));
+    act(() => result.current.setReason('d', 'busy'));
+    expect(result.current.getDay('d').reason).toBe('busy');
+    act(() => result.current.setTier('d', 'trained'));
+    expect(result.current.getDay('d').reason).toBe(null);
+  });
+
+  test('exercises survive a tier change', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    const ex = [{ id: '1', name: 'Squat', sets: '5', reps: '5', weight: '80' }];
+    act(() => result.current.setTier('d', 'trained'));
+    act(() => result.current.setExercises('d', ex));
+    act(() => result.current.setTier('d', 'skipped'));
+    expect(result.current.getDay('d').exercises).toEqual(ex);
+  });
+
+  test('marking one day leaves another alone', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('a', 'trained'));
+    act(() => result.current.setTier('b', 'skipped'));
+    expect(result.current.getDay('a').tier).toBe('trained');
+    expect(result.current.getDay('b').tier).toBe('skipped');
+  });
+});
+
+describe('setPref', () => {
+  test('merges rather than replacing', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setPref('theme', 'light'));
+    act(() => result.current.setPref('catchUpDismissedFor', '2026-09-02'));
+    expect(result.current.prefs).toEqual({
+      theme: 'light',
+      catchUpDismissedFor: '2026-09-02',
+    });
+  });
+});
+
+describe('replaceAll (import)', () => {
+  test('swaps the whole store', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('old', 'trained'));
+    act(() =>
+      result.current.replaceAll({
+        days: { new: { tier: 'rest', reason: null, exercises: [] } },
+        prefs: { theme: 'light' },
+      }),
+    );
+    expect(result.current.getDay('old').tier).toBe(null);
+    expect(result.current.getDay('new').tier).toBe('rest');
+    expect(result.current.prefs).toEqual({ theme: 'light' });
+  });
+
+  test('normalises a missing prefs to {}', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.replaceAll({ days: {} }));
+    expect(result.current.prefs).toEqual({});
+  });
+
+  test('a null / junk payload becomes an empty store, not a crash', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('a', 'trained'));
+    act(() => result.current.replaceAll(null));
+    expect(result.current.getDay('a')).toEqual(blankDay());
+    expect(result.current.prefs).toEqual({});
+  });
+});
+
+describe('persistence', () => {
+  test('writes through to localStorage on every change', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('2026-09-03', 'trained'));
+    expect(stored().days['2026-09-03'].tier).toBe('trained');
+    act(() => result.current.setPref('theme', 'light'));
+    expect(stored().prefs.theme).toBe('light');
+  });
+});
