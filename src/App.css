@@ -615,7 +615,7 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   align-items: end;
-  height: 74px;
+  height: 78px;
   margin-bottom: 10px;
 }
 
@@ -749,29 +749,28 @@
   .stroke::before,
 .day-col:is([data-tier='trained'], [data-tier='skipped'], [data-tier='rest'])
   .stroke::after {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
+/* every label sits in the same 16px round box (transparent border) so the
+   columns stay aligned; today's box gets an amber ring */
 .day-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
   color: var(--chalk-dim);
   letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid transparent;
+  border-radius: 50%;
 }
 
 .day-col.is-today .day-label {
   color: var(--chalk);
-  position: relative;
-}
-
-.day-col.is-today .day-label::after {
-  content: '';
-  display: block;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--amber);
-  margin: 4px auto 0;
+  border-color: rgba(201, 154, 74, 0.75);
 }
 
 /* ---- Training-log detail screen --------------------------- */
