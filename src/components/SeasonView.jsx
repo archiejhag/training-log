@@ -1,4 +1,4 @@
-import { weekKeysForOffset } from '../lib/date';
+import { weekKeysForOffset, weekDowLabels } from '../lib/date';
 import { seasonSummary, SEASON_WEEKS } from '../lib/insights';
 import HistoryToggle from './HistoryToggle';
 
@@ -8,8 +8,6 @@ import HistoryToggle from './HistoryToggle';
 
    Non-interactive on purpose. Week and Month are where you tap to edit a
    day; this view is for reading the shape and the line under it. */
-
-const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 function caption({ count, recovered, ongoing, weeks }) {
   if (count === 0) {
@@ -28,10 +26,17 @@ function caption({ count, recovered, ongoing, weeks }) {
   } followed by a return.`;
 }
 
-export default function SeasonView({ getDay, today, historyMode, onHistoryMode }) {
+export default function SeasonView({
+  getDay,
+  today,
+  weekStart = 'monday',
+  historyMode,
+  onHistoryMode,
+}) {
+  const DOW = weekDowLabels(weekStart);
   // Oldest week first, the current week last.
   const weeks = Array.from({ length: SEASON_WEEKS }, (_, i) =>
-    weekKeysForOffset(-(SEASON_WEEKS - 1 - i)),
+    weekKeysForOffset(-(SEASON_WEEKS - 1 - i), weekStart),
   );
   const flat = weeks.flat();
   const todayIndex = flat.indexOf(today);

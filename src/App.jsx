@@ -56,7 +56,13 @@ export default function App() {
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
   const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
 
-  const week = weekKeysForOffset(weekOffset);
+  // Which day starts the week, for every display that lays days out in a
+  // row (weekly strip, month grid, term view). "same weekday" matching
+  // (fillOptions, below) is a separate, unrelated use of weekdayIndex and
+  // always keeps its Monday-based default regardless of this.
+  const weekStart = prefs.weekStart === 'sunday' ? 'sunday' : 'monday';
+
+  const week = weekKeysForOffset(weekOffset, weekStart);
   const day = getDay(selectedDate);
   const isToday = selectedDate === today;
 
@@ -169,6 +175,16 @@ export default function App() {
   const showReasonNote = !busy.offer && reasonNote.show;
   const dismissReasonNote = () => setPref('reasonPatternSeenAt', today);
 
+  // Settings -> "Clear all". Wipes the cloud copy first (if signed in),
+  // then local — see useSync's clearRemote for why that order, and the
+  // brief pause around it.
+  const clearAllData = async () => {
+    if (auth.status === 'in' && auth.user) {
+      await sync.clearRemote(auth.user.id);
+    }
+    replaceAll({ days: {}, prefs: {} });
+  };
+
   // One quiet line the day you come back after a week-plus away.
   const reEntry = useMemo(
     () => isReEntry(allData.days, { today }),
@@ -194,8 +210,8 @@ export default function App() {
     const next = Math.min(0, weekOffset + delta);
     if (next === weekOffset) return;
     setWeekOffset(next);
-    const nextWeek = weekKeysForOffset(next);
-    setSelectedDate(next === 0 ? today : nextWeek[weekdayIndex(selectedDate)]);
+    const nextWeek = weekKeysForOffset(next, weekStart);
+    setSelectedDate(next === 0 ? today : nextWeek[weekdayIndex(selectedDate, weekStart)]);
   };
 
   const markYesterday = (tier, reason) => {
@@ -312,6 +328,7 @@ export default function App() {
                 today={today}
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
+                weekStart={weekStart}
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />
@@ -319,6 +336,7 @@ export default function App() {
               <SeasonView
                 getDay={getDay}
                 today={today}
+                weekStart={weekStart}
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />
@@ -328,10 +346,13 @@ export default function App() {
           <Settings
             allData={allData}
             onImport={replaceAll}
+            onClearAll={clearAllData}
             auth={auth}
             sync={sync}
             weeklyBar={weeklyBar}
             onWeeklyBar={(n) => setPref('weeklyBar', n)}
+            weekStart={weekStart}
+            onWeekStart={(w) => setPref('weekStart', w)}
             theme={prefs.theme === 'light' ? 'light' : 'dark'}
             onTheme={(t) => setPref('theme', t)}
             onBack={() => setView('home')}

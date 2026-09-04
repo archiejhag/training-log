@@ -63,6 +63,15 @@ async function upsertPrefs(userId, prefs) {
   if (error) throw error;
 }
 
+async function deleteEverything(userId) {
+  const [daysRes, prefsRes] = await Promise.all([
+    supabase.from('days').delete().eq('user_id', userId),
+    supabase.from('prefs').delete().eq('user_id', userId),
+  ]);
+  if (daysRes.error) throw daysRes.error;
+  if (prefsRes.error) throw prefsRes.error;
+}
+
 export function useSync({ user, allData, replaceAll }) {
   const [status, setStatus] = useState(supabase ? 'idle' : 'off');
   const [error, setError] = useState(null);
@@ -85,8 +94,14 @@ export function useSync({ user, allData, replaceAll }) {
   const pullingRef = useRef(false);
   const lastPulledAtRef = useRef(0);
   const realtimeDebounceRef = useRef(null);
+  // Set for a moment around "clear everything" — a delete on one side and a
+  // replaceAll on the other can't be one atomic action, so pull/push are
+  // paused in between rather than risk a pull resurrecting what's being
+  // cleared, or a push undoing the remote delete, mid-operation.
+  const suspendedRef = useRef(false);
 
   const pushDiff = useCallback(async (uid) => {
+    if (suspendedRef.current) return;
     const { days, prefs } = dataRef.current;
     const dueDates = Object.keys(days).filter(
       (k) => days[k].updatedAt && days[k].updatedAt !== pushedDaysRef.current[k],
@@ -110,7 +125,7 @@ export function useSync({ user, allData, replaceAll }) {
 
   const pullAndMerge = useCallback(
     async (uid) => {
-      if (pullingRef.current) return;
+      if (pullingRef.current || suspendedRef.current) return;
       pullingRef.current = true;
       setStatus('syncing');
       try {
@@ -229,5 +244,23 @@ export function useSync({ user, allData, replaceAll }) {
     };
   }, [user, pullAndMerge]);
 
-  return { status, error };
+  // Delete every row this user has, remotely. Suspends pull/push for a
+  // beat afterward so the caller has time to also clear local state
+  // (App.jsx's "Clear all") before syncing resumes — otherwise a
+  // pull-and-merge racing in between the two clears would treat the
+  // not-yet-cleared side as "the real data" and bring it right back.
+  const clearRemote = useCallback(async (uid) => {
+    suspendedRef.current = true;
+    try {
+      await deleteEverything(uid);
+      pushedDaysRef.current = {};
+      pushedPrefsAtRef.current = null;
+    } finally {
+      setTimeout(() => {
+        suspendedRef.current = false;
+      }, 1000);
+    }
+  }, []);
+
+  return { status, error, clearRemote };
 }

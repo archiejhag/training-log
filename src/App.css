@@ -241,6 +241,11 @@
   line-height: 1.5;
 }
 
+/* a second sub-paragraph introducing another control in the same card */
+.card .sub.sub-secondary {
+  margin-top: 18px;
+}
+
 /* ---- Training log: Exercises / Just write it toggle ---------- */
 
 .log-mode {
@@ -2220,6 +2225,42 @@ button.week-stat-btn:focus-visible {
 
 .settings-msg.is-err {
   color: var(--amber);
+}
+
+.danger-zone {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.danger-btn {
+  appearance: none;
+  border: 1px solid rgba(201, 154, 74, 0.4);
+  background: transparent;
+  color: var(--amber);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: rgba(201, 154, 74, 0.12);
+  border-color: rgba(201, 154, 74, 0.7);
+}
+
+.danger-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.danger-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
 }
 
 /* ---- Settings: sync panel -------------------------------- */

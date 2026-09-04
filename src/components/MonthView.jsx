@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { monthKeys, monthLabel, weekdayIndex, weekdayName } from '../lib/date';
+import { monthKeys, monthLabel, weekdayIndex, weekdayName, weekDowLabels } from '../lib/date';
 import HistoryToggle from './HistoryToggle';
 
 /* The board, zoomed out: a calendar month of small marks. Same three-tier
@@ -7,22 +7,22 @@ import HistoryToggle from './HistoryToggle';
    the pattern is there to be read, not scored. Tapping a day selects it,
    so you can mark it from the check-in card above without leaving. */
 
-const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
 export default function MonthView({
   getDay,
   today,
   selectedDate,
   onSelectDate,
+  weekStart = 'monday',
   historyMode,
   onHistoryMode,
 }) {
   const [offset, setOffset] = useState(0); // 0 = this month, negative = past
   const gridRef = useRef(null);
 
+  const DOW = weekDowLabels(weekStart);
   const days = monthKeys(offset);
   const marked = days.filter((k) => getDay(k).tier).length;
-  const firstCol = weekdayIndex(days[0]); // 0..6 (Mon..Sun)
+  const firstCol = weekdayIndex(days[0], weekStart); // 0..6, in display order
 
   // Roving tabindex: one cell in the tab order, arrows move within the grid.
   const initialFocus = () => {

@@ -16,10 +16,13 @@ function plural(n) {
 export default function Settings({
   allData,
   onImport,
+  onClearAll,
   auth,
   sync,
   weeklyBar = null,
   onWeeklyBar,
+  weekStart = 'monday',
+  onWeekStart,
   theme,
   onTheme,
   onBack,
@@ -27,6 +30,7 @@ export default function Settings({
   const fileRef = useRef(null);
   const backRef = useRef(null);
   const [msg, setMsg] = useState(null); // { kind: 'ok' | 'err', text }
+  const [clearing, setClearing] = useState(false);
 
   // Land keyboard focus somewhere sensible on this screen.
   useEffect(() => {
@@ -72,6 +76,28 @@ export default function Settings({
 
     onImport(parsed);
     setMsg({ kind: 'ok', text: `Imported ${incoming} ${plural(incoming)}.` });
+  };
+
+  const handleClearAll = async () => {
+    const signedIn = auth?.status === 'in';
+    const ok = window.confirm(
+      `Delete everything — all ${dayCount} ${plural(dayCount)} and every setting? ` +
+        `This can't be undone${signedIn ? ', including your synced copy in the cloud' : ''}.`,
+    );
+    if (!ok) return;
+
+    setClearing(true);
+    try {
+      await onClearAll();
+      setMsg({ kind: 'ok', text: 'Everything cleared.' });
+    } catch (e) {
+      setMsg({
+        kind: 'err',
+        text: e.message ?? "Couldn't reach the cloud copy — nothing was cleared.",
+      });
+    } finally {
+      setClearing(false);
+    }
   };
 
   return (
@@ -124,6 +150,17 @@ export default function Settings({
             {msg.text}
           </p>
         )}
+
+        <div className="danger-zone">
+          <button
+            type="button"
+            className="danger-btn"
+            onClick={handleClearAll}
+            disabled={dayCount === 0 || clearing}
+          >
+            {clearing ? 'Clearing…' : 'Clear all'}
+          </button>
+        </div>
       </section>
 
       <SyncPanel auth={auth} sync={sync} />
@@ -173,6 +210,27 @@ export default function Settings({
               className={theme === value ? 'is-on' : undefined}
               aria-pressed={theme === value}
               onClick={() => onTheme(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <p className="sub sub-secondary">
+          Which day starts the week, in the weekly strip, the month grid, and
+          the term view.
+        </p>
+        <div className="hist-toggle" role="group" aria-label="Week starts on">
+          {[
+            ['monday', 'Monday'],
+            ['sunday', 'Sunday'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={weekStart === value ? 'is-on' : undefined}
+              aria-pressed={weekStart === value}
+              onClick={() => onWeekStart(value)}
             >
               {label}
             </button>

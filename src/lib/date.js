@@ -31,12 +31,12 @@ export function yesterdayKey() {
   return toKey(d);
 }
 
-/** The 7 keys Mon..Sun for the week that contains `ref` (default: now). */
-export function weekKeys(ref = new Date()) {
+/** The 7 keys for the week that contains `ref` (default: now), in display
+    order — Mon..Sun normally, or Sun..Sat if `weekStart` is "sunday". */
+export function weekKeys(ref = new Date(), weekStart = 'monday') {
   const start = new Date(ref);
-  // JS getDay(): 0 = Sunday. Shift so 0 = Monday.
-  const offsetToMonday = (start.getDay() + 6) % 7;
-  start.setDate(start.getDate() - offsetToMonday);
+  const offset = weekStart === 'sunday' ? start.getDay() : (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - offset);
   start.setHours(0, 0, 0, 0);
 
   return Array.from({ length: 7 }, (_, i) => {
@@ -46,16 +46,29 @@ export function weekKeys(ref = new Date()) {
   });
 }
 
-/** The Mon..Sun keys for a week `n` weeks from this one (n < 0 = past). */
-export function weekKeysForOffset(n) {
+/** The display-order keys for a week `n` weeks from this one (n < 0 = past). */
+export function weekKeysForOffset(n, weekStart = 'monday') {
   const ref = new Date();
   ref.setDate(ref.getDate() + n * 7);
-  return weekKeys(ref);
+  return weekKeys(ref, weekStart);
 }
 
-/** 0 = Monday .. 6 = Sunday, for lining a date up with a column in the strip. */
-export function weekdayIndex(key) {
-  return (parseKey(key).getDay() + 6) % 7;
+/** A date's column position in a week row, given where the week starts.
+    Defaults to Monday-first (0 = Mon .. 6 = Sun) — this is also the
+    convention "same weekday" matching (App.jsx's fillOptions) relies on,
+    so leave the default alone even if the display preference changes;
+    only the display code (MonthView, SeasonView, the paging in App.jsx)
+    should ever pass `weekStart` explicitly. */
+export function weekdayIndex(key, weekStart = 'monday') {
+  const dow = parseKey(key).getDay(); // 0 = Sunday
+  return weekStart === 'sunday' ? dow : (dow + 6) % 7;
+}
+
+/** The day-letter header for a week row, in the matching display order. */
+export function weekDowLabels(weekStart = 'monday') {
+  return weekStart === 'sunday'
+    ? ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+    : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 }
 
 const LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];

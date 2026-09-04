@@ -7,6 +7,7 @@ import {
   weekKeys,
   weekKeysForOffset,
   weekdayIndex,
+  weekDowLabels,
   dayLetter,
   weekdayName,
   weekRangeLabel,
@@ -89,6 +90,28 @@ describe('weekKeys', () => {
   });
 });
 
+describe('weekKeys with weekStart: "sunday"', () => {
+  test('a Thursday lands in a Sun–Sat week', () => {
+    expect(weekKeys(parseKey(THURSDAY), 'sunday')).toEqual([
+      '2026-08-30',
+      '2026-08-31',
+      '2026-09-01',
+      '2026-09-02',
+      '2026-09-03',
+      '2026-09-04',
+      '2026-09-05',
+    ]);
+  });
+
+  test('Sunday is index 0, not the tail of the previous week', () => {
+    expect(weekKeys(parseKey('2026-08-30'), 'sunday')[0]).toBe('2026-08-30');
+  });
+
+  test('omitting weekStart still means Monday-first (no behaviour change)', () => {
+    expect(weekKeys(parseKey(THURSDAY))).toEqual(weekKeys(parseKey(THURSDAY), 'monday'));
+  });
+});
+
 describe('weekKeysForOffset (clock-relative)', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
@@ -106,6 +129,18 @@ describe('weekdayIndex / dayLetter / weekdayName', () => {
     expect(weekdayIndex('2026-08-31')).toBe(0); // Mon
     expect(weekdayIndex('2026-09-03')).toBe(3); // Thu
     expect(weekdayIndex('2026-09-06')).toBe(6); // Sun
+  });
+
+  test('weekdayIndex with weekStart "sunday": Sunday 0 … Saturday 6', () => {
+    expect(weekdayIndex('2026-08-30', 'sunday')).toBe(0); // Sun
+    expect(weekdayIndex('2026-08-31', 'sunday')).toBe(1); // Mon
+    expect(weekdayIndex('2026-09-05', 'sunday')).toBe(6); // Sat
+  });
+
+  test('weekDowLabels matches each weekStart', () => {
+    expect(weekDowLabels()).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S']);
+    expect(weekDowLabels('monday')).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S']);
+    expect(weekDowLabels('sunday')).toEqual(['S', 'M', 'T', 'W', 'T', 'F', 'S']);
   });
 
   test('dayLetter', () => {
