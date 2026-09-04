@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
+import { useAuth } from './hooks/useAuth';
 import {
   todayKey,
   yesterdayKey,
@@ -45,6 +46,8 @@ export default function App() {
     allData,
     replaceAll,
   } = useTrainingLog();
+
+  const auth = useAuth();
 
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
@@ -323,6 +326,7 @@ export default function App() {
           <Settings
             allData={allData}
             onImport={replaceAll}
+            auth={auth}
             weeklyBar={weeklyBar}
             onWeeklyBar={(n) => setPref('weeklyBar', n)}
             theme={prefs.theme === 'light' ? 'light' : 'dark'}

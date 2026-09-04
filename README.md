@@ -47,8 +47,16 @@ npm run dev
 ```
 
 Then open the printed `localhost` URL. `npm run build` outputs static files to
-`dist/`. `npm test` runs the Vitest suite (the date helpers and the
-`useTrainingLog` reducer).
+`dist/`. `npm test` runs the Vitest suite (the date helpers, the
+`useTrainingLog` reducer, and the `insights` readings).
+
+### Sync (optional)
+
+Leave it unconfigured and the app is local-only, exactly as described above.
+To turn on cross-device sync via Supabase, follow
+[`docs/supabase-setup.md`](docs/supabase-setup.md) — create a project, run
+`supabase/migrations/0001_init.sql`, and set `VITE_SUPABASE_URL` /
+`VITE_SUPABASE_ANON_KEY`.
 
 ## Stack
 

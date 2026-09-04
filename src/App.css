@@ -2221,3 +2221,36 @@ button.week-stat-btn:focus-visible {
 .settings-msg.is-err {
   color: var(--amber);
 }
+
+/* ---- Settings: sync panel -------------------------------- */
+
+.sync-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.sync-email {
+  flex: 1 1 12rem;
+  min-width: 0;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 9px 10px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.sync-email::placeholder {
+  color: var(--chalk-dim);
+  opacity: 0.8;
+}
+
+.sync-email:focus {
+  outline: none;
+  border-color: rgba(201, 154, 74, 0.55);
+}

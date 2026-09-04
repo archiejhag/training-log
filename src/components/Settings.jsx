@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import SyncPanel from './SyncPanel';
 
-/* First settings surface. One job for now: get your data in and out.
-   Everything is in localStorage, so "export" is the only backup there is. */
+/* Settings: data in/out, cross-device sync, the weekly bar, and theme.
+   localStorage is always the working copy; sync (when configured) layers
+   on top. */
 
 function countDays(data) {
   return Object.keys(data.days ?? {}).length;
@@ -14,6 +16,7 @@ function plural(n) {
 export default function Settings({
   allData,
   onImport,
+  auth,
   weeklyBar = null,
   onWeeklyBar,
   theme,
@@ -121,6 +124,8 @@ export default function Settings({
           </p>
         )}
       </section>
+
+      <SyncPanel auth={auth} />
 
       <section className="card">
         <h2>Your week</h2>
