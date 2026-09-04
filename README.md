@@ -5,7 +5,7 @@
 A training habit-tracker built for real-life inconsistency — three honest daily
 states, no streaks, no guilt dashboards.
 
-**Live demo:** <https://training-log-roan.vercel.app> · **Roadmap:** [`docs/roadmap.md`](docs/roadmap.md)
+**Live demo:** <https://training-log-roan.vercel.app> · **Roadmap:** [`docs/roadmap.md`](docs/roadmap.md) · **Case study:** [`docs/case-study.md`](docs/case-study.md)
 
 ## Why
 
