@@ -11,7 +11,11 @@
    reasonPattern: a gentle observation, no action attached. When one skip
    reason keeps coming up ("Busy", "Not feeling it"), name it once and
    reframe it. The caller suppresses it while busyStretch is showing so
-   the two don't talk over each other. */
+   the two don't talk over each other.
+
+   isReEntry: true on the day you come back after a real absence — today
+   is marked, and the last marked day before it was a week-plus ago. The
+   caller shows one quiet line; it clears itself tomorrow. */
 
 import { parseKey } from './date';
 
@@ -20,6 +24,8 @@ const WINDOW_DAYS = 14; // how far back "lately" reaches
 const MIN_SKIPS = 3; // Skipped days in the window that count as a cluster
 const TARGET_BAR = 2; // the smaller bar we offer to switch to
 const SNOOZE_DAYS = 14; // silence after the user dismisses or accepts
+
+const MIN_GAP_DAYS = 8; // last mark this many days back ⇒ a true "back in"
 
 const REASON_MIN = 3; // same reason this many times ⇒ worth naming
 // Only reasons we have something kind and specific to say about. A tie is
@@ -96,4 +102,27 @@ export function reasonPattern(days, { today, dismissedAt } = {}) {
 
   result.show = true;
   return result;
+}
+
+/**
+ * True on the day you return after a real absence: today is marked, and the
+ * most recent marked day before it was at least MIN_GAP_DAYS ago. A brand-new
+ * user's first mark is not re-entry (there's nothing before it).
+ * @param {Record<string, {tier?: string|null}>} days
+ * @param {object} ctx
+ * @param {string} ctx.today  "YYYY-MM-DD" for "now"
+ * @returns {boolean}
+ */
+export function isReEntry(days, { today } = {}) {
+  if (!days?.[today]?.tier) return false;
+
+  let lastBefore = null;
+  for (const [key, day] of Object.entries(days)) {
+    if (!day.tier) continue;
+    if (daysBetween(today, key) <= 0) continue; // today or the future
+    if (lastBefore == null || key > lastBefore) lastBefore = key;
+  }
+  if (lastBefore == null) return false;
+
+  return daysBetween(today, lastBefore) >= MIN_GAP_DAYS;
 }

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { busyStretch, reasonPattern } from './insights';
+import { busyStretch, reasonPattern, isReEntry } from './insights';
 
 const TODAY = '2026-09-15';
 
@@ -175,5 +175,47 @@ describe('reasonPattern', () => {
       dismissedAt: '2026-08-30', // 16 days ago
     });
     expect(r.show).toBe(true);
+  });
+});
+
+describe('isReEntry', () => {
+  const at = (entries) => isReEntry(days(entries), { today: TODAY });
+
+  test('today not marked → false', () => {
+    expect(at([[8, 'trained']])).toBe(false);
+  });
+
+  test('first mark ever (nothing before today) → false', () => {
+    expect(at([[0, 'trained']])).toBe(false);
+  });
+
+  test('last mark 8 days ago → true (inclusive edge)', () => {
+    expect(at([[0, 'trained'], [8, 'trained']])).toBe(true);
+  });
+
+  test('last mark 7 days ago → false', () => {
+    expect(at([[0, 'trained'], [7, 'trained']])).toBe(false);
+  });
+
+  test('last mark weeks ago → true', () => {
+    expect(at([[0, 'skipped'], [23, 'trained']])).toBe(true);
+  });
+
+  test('marked yesterday → false', () => {
+    expect(at([[0, 'trained'], [1, 'trained']])).toBe(false);
+  });
+
+  test('any tier counts as the prior mark, not just Trained', () => {
+    expect(at([[0, 'trained'], [10, 'rest']])).toBe(true);
+    expect(at([[0, 'trained'], [10, 'skipped']])).toBe(true);
+  });
+
+  test('blank days before today do not count as a prior mark', () => {
+    expect(at([[0, 'trained'], [3, null], [5, null]])).toBe(false);
+  });
+
+  test('a recent mark inside the gap keeps it from being re-entry', () => {
+    // back today, but also marked 4 days ago → not really "away"
+    expect(at([[0, 'trained'], [4, 'trained'], [20, 'trained']])).toBe(false);
   });
 });

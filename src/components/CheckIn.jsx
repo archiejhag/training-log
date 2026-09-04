@@ -27,6 +27,7 @@ const TYPES = [
 export default function CheckIn({
   day,
   isToday,
+  reEntry = false,
   dateLabel,
   onTier,
   onReason,
@@ -63,6 +64,10 @@ export default function CheckIn({
           </button>
         ))}
       </div>
+
+      {isToday && reEntry && (
+        <p className="reentry-line">Back in — that's the hard part.</p>
+      )}
 
       {day.tier === 'skipped' && (
         <div className="reason-block">

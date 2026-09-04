@@ -10,7 +10,7 @@ import {
   weekdayName,
 } from './lib/date';
 import { newId } from './lib/id';
-import { busyStretch, reasonPattern } from './lib/insights';
+import { busyStretch, reasonPattern, isReEntry } from './lib/insights';
 import CatchUp from './components/CatchUp';
 import BusyNudge from './components/BusyNudge';
 import ReasonPatternNote from './components/ReasonPatternNote';
@@ -162,6 +162,12 @@ export default function App() {
   const showReasonNote = !busy.offer && reasonNote.show;
   const dismissReasonNote = () => setPref('reasonPatternSeenAt', today);
 
+  // One quiet line the day you come back after a week-plus away.
+  const reEntry = useMemo(
+    () => isReEntry(allData.days, { today }),
+    [allData.days, today],
+  );
+
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
   const hasHistory = Object.keys(allData.days).length > 0;
@@ -268,6 +274,7 @@ export default function App() {
             <CheckIn
               day={day}
               isToday={isToday}
+              reEntry={reEntry}
               dateLabel={weekdayName(selectedDate)}
               onTier={(tier) => setTier(selectedDate, tier)}
               onReason={(reason) => setReason(selectedDate, reason)}

@@ -554,6 +554,27 @@
   gap: 8px;
 }
 
+/* quiet acknowledgement the day you come back after a long gap */
+.reentry-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: var(--chalk);
+  animation: fadeIn 0.25s ease;
+}
+
+.reentry-line::before {
+  content: '';
+  flex-shrink: 0;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--amber);
+  filter: url(#chalk-edge);
+}
+
 .tier-btn {
   appearance: none;
   border: 1px solid var(--hairline-strong);
