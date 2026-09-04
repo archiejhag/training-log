@@ -2254,3 +2254,20 @@ button.week-stat-btn:focus-visible {
   outline: none;
   border-color: rgba(201, 154, 74, 0.55);
 }
+
+.sync-status {
+  margin: 10px 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+}
+
+.sync-status.is-err {
+  color: var(--amber);
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+}

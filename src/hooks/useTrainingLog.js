@@ -7,15 +7,19 @@ import { useState, useEffect, useCallback } from 'react';
 
    Stored shape:
      {
-       days:  { "YYYY-MM-DD": { tier, reason, reasonText, type, note, freeform, exercises } },
-       prefs: { catchUpDismissedFor?, ... }   // app-wide settings, grows over time
+       days:  { "YYYY-MM-DD": { tier, reason, reasonText, type, note, freeform,
+                                 exercises, updatedAt } },
+       prefs: { catchUpDismissedFor?, ..., updatedAt }   // app-wide settings
      }
    (`type` — push/pull/legs/cardio/mobility — is optional and only meaningful
    on a Trained day. `reason` is a skip-reason id; `reasonText` is the free
    text captured only when the reason is "other". `note` is a short freeform
    line that belongs to any day, whatever its tier. `freeform` is the longer
    "just type what I did" block — an alternative to the structured
-   `exercises` list on a Trained day.)
+   `exercises` list on a Trained day. `updatedAt` is an ISO timestamp stamped
+   on every write, by this hook alone — it's what cloud sync (useSync,
+   lib/sync.js) uses to resolve conflicts, last-write-wins. Nothing else
+   should set it.)
 */
 
 const STORAGE_KEY = 'training-log/v1';
@@ -76,7 +80,10 @@ export function useTrainingLog() {
       const current = prev.days[key] ?? blankDay();
       return {
         ...prev,
-        days: { ...prev.days, [key]: { ...current, ...patch } },
+        days: {
+          ...prev.days,
+          [key]: { ...current, ...patch, updatedAt: new Date().toISOString() },
+        },
       };
     });
   }, []);
@@ -140,7 +147,7 @@ export function useTrainingLog() {
   const setPref = useCallback((key, value) => {
     setData((prev) => ({
       ...prev,
-      prefs: { ...prev.prefs, [key]: value },
+      prefs: { ...prev.prefs, [key]: value, updatedAt: new Date().toISOString() },
     }));
   }, []);
 

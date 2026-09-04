@@ -17,6 +17,7 @@ export default function Settings({
   allData,
   onImport,
   auth,
+  sync,
   weeklyBar = null,
   onWeeklyBar,
   theme,
@@ -125,7 +126,7 @@ export default function Settings({
         )}
       </section>
 
-      <SyncPanel auth={auth} />
+      <SyncPanel auth={auth} sync={sync} />
 
       <section className="card">
         <h2>Your week</h2>

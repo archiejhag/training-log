@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
 import { useAuth } from './hooks/useAuth';
+import { useSync } from './hooks/useSync';
 import {
   todayKey,
   yesterdayKey,
@@ -48,6 +49,7 @@ export default function App() {
   } = useTrainingLog();
 
   const auth = useAuth();
+  const sync = useSync({ user: auth.user, allData, replaceAll });
 
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
@@ -327,6 +329,7 @@ export default function App() {
             allData={allData}
             onImport={replaceAll}
             auth={auth}
+            sync={sync}
             weeklyBar={weeklyBar}
             onWeeklyBar={(n) => setPref('weeklyBar', n)}
             theme={prefs.theme === 'light' ? 'light' : 'dark'}

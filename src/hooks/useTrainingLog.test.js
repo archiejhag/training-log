@@ -81,6 +81,13 @@ describe('setTier', () => {
     expect(result.current.getDay('d').reasonText).toBe('');
   });
 
+  test('every patch stamps updatedAt, for cloud sync to compare against', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    expect(result.current.getDay('d').updatedAt).toBeUndefined();
+    act(() => result.current.setTier('d', 'trained'));
+    expect(typeof result.current.getDay('d').updatedAt).toBe('string');
+  });
+
   test('the session type is dropped when a day stops being trained', () => {
     const { result } = renderHook(() => useTrainingLog());
     act(() => result.current.setTier('d', 'trained'));
@@ -160,10 +167,16 @@ describe('setPref', () => {
     const { result } = renderHook(() => useTrainingLog());
     act(() => result.current.setPref('theme', 'light'));
     act(() => result.current.setPref('catchUpDismissedFor', '2026-09-02'));
-    expect(result.current.prefs).toEqual({
+    expect(result.current.prefs).toMatchObject({
       theme: 'light',
       catchUpDismissedFor: '2026-09-02',
     });
+  });
+
+  test('stamps updatedAt for cloud sync to compare against', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setPref('theme', 'light'));
+    expect(typeof result.current.prefs.updatedAt).toBe('string');
   });
 });
 
