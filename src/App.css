@@ -330,7 +330,8 @@
 /* No panel fill, just a hairline — reads as a transient nudge, not
    a permanent part of the UI like the solid .card blocks below it. */
 
-.catch-up {
+.catch-up,
+.nudge {
   position: relative;
   border: 1px solid var(--hairline);
   border-radius: 4px;
@@ -371,6 +372,74 @@
 .catch-up-dismiss:hover {
   color: var(--chalk);
   background: var(--hairline);
+}
+
+.catch-up-dismiss:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+}
+
+/* ---- Busy-stretch nudge: "want a smaller bar this stretch?" ---- */
+
+.nudge-text {
+  font-size: 12.5px;
+  color: var(--chalk-dim);
+  line-height: 1.55;
+  margin: 0 0 12px;
+  padding-right: 34px;
+}
+
+.nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nudge-accept {
+  appearance: none;
+  border: 1px solid rgba(201, 154, 74, 0.5);
+  background: var(--panel-selected);
+  color: var(--chalk);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nudge-accept:hover {
+  transform: translateY(-1px);
+  border-color: rgba(201, 154, 74, 0.8);
+}
+
+.nudge-later {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 10px 6px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nudge-later:hover {
+  color: var(--chalk);
+}
+
+.nudge-accept:focus-visible,
+.nudge-later:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
 }
 
 .catch-up-tiers {

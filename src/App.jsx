@@ -10,7 +10,9 @@ import {
   weekdayName,
 } from './lib/date';
 import { newId } from './lib/id';
+import { busyStretch } from './lib/insights';
 import CatchUp from './components/CatchUp';
+import BusyNudge from './components/BusyNudge';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import MonthView from './components/MonthView';
@@ -128,6 +130,24 @@ export default function App() {
   // Your weekly session intention. null = no bar, fall back to "X / 7 marked".
   const weeklyBar = prefs.weeklyBar ?? null;
 
+  // "Rough stretch — want a smaller bar?" Pure reading of recent history;
+  // shows only when a bar of 3+ is running well under rate amid a skip cluster.
+  const busy = useMemo(
+    () =>
+      busyStretch(allData.days, {
+        bar: weeklyBar,
+        today,
+        dismissedAt: prefs.busyNudgeSeenAt,
+      }),
+    [allData.days, weeklyBar, today, prefs.busyNudgeSeenAt],
+  );
+
+  const acceptBusyNudge = () => {
+    setPref('weeklyBar', busy.suggestedBar);
+    setPref('busyNudgeSeenAt', today);
+  };
+  const dismissBusyNudge = () => setPref('busyNudgeSeenAt', today);
+
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
   const hasHistory = Object.keys(allData.days).length > 0;
@@ -211,6 +231,15 @@ export default function App() {
                 onMark={(tier) => markYesterday(tier)}
                 onSkip={(reason) => markYesterday('skipped', reason)}
                 onDismiss={() => setPref('catchUpDismissedFor', yesterday)}
+              />
+            )}
+
+            {busy.offer && (
+              <BusyNudge
+                skips={busy.skips}
+                suggestedBar={busy.suggestedBar}
+                onAccept={acceptBusyNudge}
+                onDismiss={dismissBusyNudge}
               />
             )}
 
