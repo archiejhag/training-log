@@ -8,9 +8,12 @@ make it honest.
 > A styled version of this roadmap lives here:
 > <https://claude.ai/code/artifact/94b7d7fe-5a1e-41e1-bc69-27ce73f9325a>
 
-Where the app is today: a two-second daily mark (Trained / Skipped / Rest), an
-optional exercise log behind it, and a weekly strip that counts **marks, not
-streaks**. It persists to `localStorage` and looks like chalk on slate.
+Where the app is today: Phases 0 through 4 below are all shipped — the core
+loop, the chalk visual identity, structured logging, the adaptive layer
+(bar, busy-stretch detection, gaps-are-normal view), and optional cloud sync
+via Supabase with CI and a performance budget behind it. **Phase 5**, at the
+bottom, is what's next: mainly finishing the visual craft in corners the
+faster-moving later phases didn't get to, not new product surface.
 
 ---
 
@@ -42,7 +45,7 @@ daily mark goes elsewhere in the flow, or gets cut.
 **Effort key:** `S` = an evening · `M` = a weekend · `L` = a few weekends.
 Tags below are `[impact · effort]`.
 
-## Phase 0 — Make the core loop unbreakable
+## Phase 0 — Make the core loop unbreakable ✅ shipped
 
 Everything after this assumes the daily mark and the weekly strip already work
 without thinking, on the device you actually carry. Nothing new until this is true.
@@ -64,7 +67,7 @@ without thinking, on the device you actually carry. Nothing new until this is tr
 - **Export / import JSON** `[Low · S]` — own your data, and get the first Settings
   surface for free.
 
-## Phase 1 — A visual identity people remember
+## Phase 1 — A visual identity people remember ✅ shipped
 
 The weekly strip is the signature object. Make it unmistakably yours, and carry
 that voice into every corner of the app.
@@ -84,7 +87,7 @@ that voice into every corner of the app.
 - **Optional "whiteboard" light theme** `[Low · S]` — the token structure already
   exists; invert it, expose a toggle in Settings.
 
-## Phase 2 — Depth in the log, without weight
+## Phase 2 — Depth in the log, without weight ✅ shipped
 
 Only once the daily mark is a genuine habit. Every item here is opt-in and
 reversible — the log must never start to feel mandatory.
@@ -102,7 +105,7 @@ reversible — the log must never start to feel mandatory.
 - **Freeform "what I did"** `[Med · S]` — a plain textarea as an alternative to
   structured rows. Some days you just type "8k run, felt good".
 
-## Phase 3 — The adaptive layer
+## Phase 3 — The adaptive layer ✅ shipped
 
 This is what makes the app different from every streak tracker. It needs a few
 weeks of real marks and skip-reasons to say anything true — which is why it comes
@@ -122,7 +125,7 @@ this late.
 - **Richer reason taxonomy** `[Low · S]` — add "Injured / unwell", "Unplanned
   rest", a custom option. Still one tap.
 
-## Phase 4 — Platform & portfolio weight
+## Phase 4 — Platform & portfolio weight ✅ shipped
 
 Last, because it's infrastructure, not product. Do it when this is an app you
 actually open every day.
@@ -137,16 +140,55 @@ actually open every day.
 - **Write the case study** `[High · S]` — the one-paragraph pitch, two screenshots,
   and the "no streaks, no ranked tiers" decision written up.
 
+## Phase 5 — Aesthetic polish
+
+Mostly finishing, not adding. Phases 2–4 moved fast and shipped real
+functionality; a few corners have plainer styling than the weekly strip's
+original chalk treatment got, or were only ever checked in one theme. Run
+these through the same four questions as anything else — a visual change
+that adds friction to the daily mark is still wrong.
+
+- **Draw-on motion for the Month view** `[Med · M]` — the weekly strip's
+  marks grow in and erase with real motion; Month view's marks currently
+  just appear and disappear on tap. Same animation, same
+  `prefers-reduced-motion` gate, extended to the grid.
+- **Whiteboard-theme audit** `[Med · S]` — everything built after the light
+  theme shipped (per-set detail, freeform mode, the sync panel, the newer
+  Settings cards, the busy-stretch and skip-reason nudges, the term view)
+  has mostly only been checked in the dark chalkboard theme. Go through
+  each in whiteboard mode and fix whatever quietly assumed dark.
+- **Fix the install splash flash for whiteboard users** `[Low · S]` — the
+  PWA manifest's `background_color` / `theme_color` are hardcoded to the
+  dark slate. Anyone whose saved preference is the light theme sees a
+  flash of dark slate on launch before the page itself paints light.
+  Decide on a real fix (or a deliberate, accepted trade-off) rather than
+  leaving it as an oversight.
+- **A view-transition beat** `[Low · S]` — Home, the log screen, and
+  Settings currently cut instantly. A short, tasteful transition (still
+  behind `prefers-reduced-motion`) would match the motion-craft already
+  spent on the strip.
+- **"Share your week" as a chalk-styled image** `[Med · M]` — render a
+  week or month strip to a downloadable image, in the app's own visual
+  language. Doubles as a nice feature and as ready-made portfolio /
+  screenshot material.
+
+### Also worth considering — functional, not aesthetic
+
+Flagged because they're genuinely open, not because they belong in this
+phase's theme:
+
+- **Lazy-load the Supabase client** `[Med · M]` — noted back when cloud
+  sync shipped and again when the CI performance budget was measured:
+  `@supabase/supabase-js` alone accounts for most of the JS weight a
+  purely local-only visit pays for. Splitting it into its own chunk,
+  loaded only once sync is actually configured, is the real fix.
+- **An opt-in daily reminder** `[Med · M]` — "the line we don't cross"
+  above explicitly allows exactly one: a single, gentle, opt-in nudge.
+  Never built. Needs a service-worker push subscription and a Settings
+  toggle; still has to fail question 2 (no added friction to the mark
+  itself) to be worth doing.
+
 ---
-
-## Right now
-
-1. **Deploy it** and put the live link in the README.
-2. **Edit past days** from the strip — close the gap in the core promise.
-3. **The catch-up-yesterday prompt** — the smallest thing that makes a missed day
-   recoverable.
-
-Everything else waits behind these three.
 
 *Living document — reorder freely within a phase. The only fixed part is "the
 line we don't cross".*
