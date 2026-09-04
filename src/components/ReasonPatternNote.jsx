@@ -7,7 +7,7 @@
 
 const COPY = {
   busy: (n) =>
-    `"Busy" has come up ${n} times in the last two weeks. That reads like a season, not a slip — a lighter week still counts.`,
+    `"Busy" has come up ${n} times in the last two weeks. Life's full right now — a lighter week still counts.`,
   notfeelingit: (n) =>
     `"Not feeling it" ${n} times in the last two weeks. Worth noticing, not forcing — the wanting-to usually comes back on its own.`,
 };
