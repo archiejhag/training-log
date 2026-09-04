@@ -11,7 +11,15 @@ function plural(n) {
   return n === 1 ? 'day' : 'days';
 }
 
-export default function Settings({ allData, onImport, theme, onTheme, onBack }) {
+export default function Settings({
+  allData,
+  onImport,
+  weeklyBar = null,
+  onWeeklyBar,
+  theme,
+  onTheme,
+  onBack,
+}) {
   const fileRef = useRef(null);
   const backRef = useRef(null);
   const [msg, setMsg] = useState(null); // { kind: 'ok' | 'err', text }
@@ -112,6 +120,37 @@ export default function Settings({ allData, onImport, theme, onTheme, onBack }) 
             {msg.text}
           </p>
         )}
+      </section>
+
+      <section className="card">
+        <h2>Your week</h2>
+        <p className="sub">
+          Set a number of sessions that fits your life. The weekly card counts
+          your Trained days toward this instead of 7. Fall short and nothing
+          breaks — a busy week is still a week, and you can drop the number any
+          time.
+        </p>
+        <div className="bar-chips" role="group" aria-label="Weekly bar">
+          <button
+            type="button"
+            className={'bar-chip' + (weeklyBar == null ? ' selected' : '')}
+            aria-pressed={weeklyBar == null}
+            onClick={() => onWeeklyBar(null)}
+          >
+            No bar
+          </button>
+          {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={'bar-chip' + (weeklyBar === n ? ' selected' : '')}
+              aria-pressed={weeklyBar === n}
+              onClick={() => onWeeklyBar(n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="card">

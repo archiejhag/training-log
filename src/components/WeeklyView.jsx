@@ -3,7 +3,10 @@ import { dayLetter, weekdayName, weekRangeLabel } from '../lib/date';
 import HistoryToggle from './HistoryToggle';
 
 /* The "This week" card. Seven equal chalk strokes — colour tells you the
-   state, height never does. The count is "X / 7 marked", never a streak.
+   state, height never does. By default the count is "X / 7 marked", never a
+   streak. If you've set a weekly bar (Settings › Your week) it reads
+   "<trained> / <bar>" — your own number — with "X / 7 marked" kept as a quiet
+   second line. Falling short of the bar is never dramatised.
    A tiny amber dot above a stroke means that Trained day also has exercise
    detail logged.
 
@@ -27,10 +30,13 @@ export default function WeeklyView({
   selectedDate,
   onSelectDate,
   onErase,
+  bar = null,
+  onEditBar,
   historyMode,
   onHistoryMode,
 }) {
   const marked = week.filter((key) => getDay(key).tier).length;
+  const trained = week.filter((key) => getDay(key).tier === 'trained').length;
   const stripRef = useRef(null);
 
   // The eraser only works on a marked day that's actually on screen.
@@ -132,9 +138,29 @@ export default function WeeklyView({
             &rsaquo;
           </button>
         </div>
-        <span className="week-stat" aria-live="polite">
-          <b>{marked}</b> / 7 marked
-        </span>
+        {bar != null ? (
+          <button
+            type="button"
+            className="week-stat week-stat-btn"
+            onClick={onEditBar}
+            aria-live="polite"
+            aria-label={`Weekly bar: trained ${trained} of ${bar}. Change your bar.`}
+          >
+            <span className="week-stat-main">
+              <b>{trained}</b> / {bar}
+            </span>
+            <span className="week-substat">{marked} / 7 marked</span>
+          </button>
+        ) : (
+          <span className="week-stat" aria-live="polite">
+            <span className="week-stat-main">
+              <b>{marked}</b> / 7 marked
+            </span>
+            <button type="button" className="set-bar-link" onClick={onEditBar}>
+              Set a weekly bar
+            </button>
+          </span>
+        )}
       </div>
 
       <div
@@ -189,9 +215,11 @@ export default function WeeklyView({
       </div>
 
       <p className="footnote">
-        {marked === 0
-          ? 'Tap any day to fill it in. A blank week is just a blank week — nothing to make up.'
-          : 'Tap any day to fill it in. Every mark stands on its own.'}
+        {bar != null && trained >= bar
+          ? "That's your bar for the week. Anything more is a bonus."
+          : marked === 0
+            ? 'Tap any day to fill it in. A blank week is just a blank week — nothing to make up.'
+            : 'Tap any day to fill it in. Every mark stands on its own.'}
       </p>
     </section>
   );

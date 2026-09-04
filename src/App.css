@@ -811,7 +811,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 6px;
   margin-bottom: 14px;
+}
+
+/* keeps the count hard-right when a small card wraps it below the nav */
+.week-header .week-stat {
+  margin-left: auto;
 }
 
 .week-nav {
@@ -864,11 +871,109 @@
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;
   color: var(--chalk-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
 }
 
 .week-stat b {
   color: var(--chalk);
   font-weight: 500;
+}
+
+.week-stat-main,
+.week-substat {
+  white-space: nowrap;
+}
+
+.week-substat {
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  opacity: 0.72;
+}
+
+/* When a bar is set the whole stat is a button through to Settings. */
+button.week-stat-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+button.week-stat-btn:hover {
+  color: var(--chalk);
+}
+
+button.week-stat-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.set-bar-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.set-bar-link:hover {
+  color: var(--chalk);
+}
+
+.set-bar-link:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Settings — weekly bar picker */
+.bar-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.bar-chip {
+  appearance: none;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  min-width: 34px;
+  padding: 9px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bar-chip:hover {
+  color: var(--chalk);
+}
+
+.bar-chip.selected {
+  background: var(--panel-selected);
+  border-color: rgba(201, 154, 74, 0.6);
+  color: var(--chalk);
+}
+
+.bar-chip:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
 }
 
 .strip {

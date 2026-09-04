@@ -125,6 +125,9 @@ export default function App() {
   const deletePreset = (id) =>
     setPref('presets', presets.filter((p) => p.id !== id));
 
+  // Your weekly session intention. null = no bar, fall back to "X / 7 marked".
+  const weeklyBar = prefs.weeklyBar ?? null;
+
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
   const hasHistory = Object.keys(allData.days).length > 0;
@@ -232,6 +235,8 @@ export default function App() {
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
                 onErase={() => setTier(selectedDate, null)}
+                bar={weeklyBar}
+                onEditBar={() => setView('settings')}
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />
@@ -250,6 +255,8 @@ export default function App() {
           <Settings
             allData={allData}
             onImport={replaceAll}
+            weeklyBar={weeklyBar}
+            onWeeklyBar={(n) => setPref('weeklyBar', n)}
             theme={prefs.theme === 'light' ? 'light' : 'dark'}
             onTheme={(t) => setPref('theme', t)}
             onBack={() => setView('home')}
