@@ -1,5 +1,10 @@
 import { describe, test, expect } from 'vitest';
-import { busyStretch, reasonPattern, isReEntry } from './insights';
+import {
+  busyStretch,
+  reasonPattern,
+  isReEntry,
+  seasonSummary,
+} from './insights';
 
 const TODAY = '2026-09-15';
 
@@ -217,5 +222,101 @@ describe('isReEntry', () => {
   test('a recent mark inside the gap keeps it from being re-entry', () => {
     // back today, but also marked 4 days ago → not really "away"
     expect(at([[0, 'trained'], [4, 'trained'], [20, 'trained']])).toBe(false);
+  });
+});
+
+describe('seasonSummary', () => {
+  const rep = (n, v) => Array.from({ length: n }, () => v);
+
+  test('all trained → no quiet stretches', () => {
+    expect(seasonSummary(rep(20, 'trained'))).toMatchObject({
+      count: 0,
+      recovered: 0,
+      ongoing: false,
+      longest: 0,
+    });
+  });
+
+  test('a closed 8-day gap between training → one recovered stretch', () => {
+    const tiers = [...rep(3, 'trained'), ...rep(8, null), ...rep(3, 'trained')];
+    expect(seasonSummary(tiers)).toMatchObject({
+      count: 1,
+      recovered: 1,
+      ongoing: false,
+      longest: 8,
+    });
+  });
+
+  test('a 6-day gap is below the threshold', () => {
+    const tiers = [...rep(3, 'trained'), ...rep(6, null), ...rep(3, 'trained')];
+    expect(seasonSummary(tiers)).toMatchObject({ count: 0, recovered: 0 });
+  });
+
+  test('two closed gaps → two recovered', () => {
+    const tiers = [
+      ...rep(2, 'trained'),
+      ...rep(7, null),
+      ...rep(2, 'trained'),
+      ...rep(9, 'skipped'),
+      ...rep(2, 'trained'),
+    ];
+    expect(seasonSummary(tiers)).toMatchObject({
+      count: 2,
+      recovered: 2,
+      ongoing: false,
+      longest: 9,
+    });
+  });
+
+  test('a gap still open at "today" is ongoing, not recovered', () => {
+    const tiers = [...rep(4, 'trained'), ...rep(9, null)];
+    expect(seasonSummary(tiers)).toMatchObject({
+      count: 1,
+      recovered: 0,
+      ongoing: true,
+      longest: 9,
+    });
+  });
+
+  test('one recovered gap plus an ongoing one', () => {
+    const tiers = [
+      ...rep(2, 'trained'),
+      ...rep(7, null),
+      'trained',
+      ...rep(8, 'skipped'),
+    ];
+    expect(seasonSummary(tiers)).toMatchObject({
+      count: 2,
+      recovered: 1,
+      ongoing: true,
+    });
+  });
+
+  test('todayIndex ignores everything after it', () => {
+    const tiers = [...rep(3, 'trained'), ...rep(10, null)];
+    // only the first 6 count → a 3-day trailing run, below threshold
+    expect(seasonSummary(tiers, { todayIndex: 5 })).toMatchObject({
+      count: 0,
+      ongoing: false,
+    });
+  });
+
+  test('Skipped and Rest both count as quiet days', () => {
+    const tiers = [
+      ...rep(2, 'trained'),
+      'skipped',
+      'rest',
+      'skipped',
+      'rest',
+      'skipped',
+      'rest',
+      'skipped',
+      ...rep(2, 'trained'),
+    ];
+    expect(seasonSummary(tiers)).toMatchObject({ count: 1, recovered: 1 });
+  });
+
+  test('empty history → nothing', () => {
+    expect(seasonSummary([])).toMatchObject({ count: 0, ongoing: false });
   });
 });

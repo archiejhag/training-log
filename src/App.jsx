@@ -17,6 +17,7 @@ import ReasonPatternNote from './components/ReasonPatternNote';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import MonthView from './components/MonthView';
+import SeasonView from './components/SeasonView';
 import TrainingLog from './components/TrainingLog';
 import Settings from './components/Settings';
 
@@ -47,7 +48,7 @@ export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
-  const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month'
+  const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
 
   const week = weekKeysForOffset(weekOffset);
   const day = getDay(selectedDate);
@@ -298,12 +299,19 @@ export default function App() {
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />
-            ) : (
+            ) : historyMode === 'month' ? (
               <MonthView
                 getDay={getDay}
                 today={today}
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
+                historyMode={historyMode}
+                onHistoryMode={setHistoryMode}
+              />
+            ) : (
+              <SeasonView
+                getDay={getDay}
+                today={today}
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />

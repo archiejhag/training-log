@@ -15,7 +15,11 @@
 
    isReEntry: true on the day you come back after a real absence — today
    is marked, and the last marked day before it was a week-plus ago. The
-   caller shows one quiet line; it clears itself tomorrow. */
+   caller shows one quiet line; it clears itself tomorrow.
+
+   seasonSummary: reads a run of days as active/quiet stretches so the
+   "gaps are normal" view can say, truthfully, that the quiet ones ended.
+   Takes a flat array of tiers (oldest first) — no dates at all. */
 
 import { parseKey } from './date';
 
@@ -26,6 +30,9 @@ const TARGET_BAR = 2; // the smaller bar we offer to switch to
 const SNOOZE_DAYS = 14; // silence after the user dismisses or accepts
 
 const MIN_GAP_DAYS = 8; // last mark this many days back ⇒ a true "back in"
+
+export const SEASON_WEEKS = 12; // how many weeks the season view spans
+const MIN_QUIET_DAYS = 7; // a non-training run this long counts as a quiet stretch
 
 const REASON_MIN = 3; // same reason this many times ⇒ worth naming
 // Only reasons we have something kind and specific to say about. A tie is
@@ -125,4 +132,41 @@ export function isReEntry(days, { today } = {}) {
   if (lastBefore == null) return false;
 
   return daysBetween(today, lastBefore) >= MIN_GAP_DAYS;
+}
+
+/**
+ * Break a run of days into quiet stretches (>= MIN_QUIET_DAYS with no Trained
+ * day). Every stretch that isn't the trailing one was, by definition, ended
+ * by a Trained day — so `recovered` is the honest count of "came back from it".
+ * @param {Array<string|null>} tiers  tier per day, oldest first
+ * @param {object} [ctx]
+ * @param {number} [ctx.todayIndex]   ignore anything after this index (future)
+ * @returns {{count: number, recovered: number, ongoing: boolean, longest: number, weeks: number}}
+ */
+export function seasonSummary(tiers, { todayIndex } = {}) {
+  const end = todayIndex == null ? tiers.length - 1 : todayIndex;
+  const seq = tiers.slice(0, end + 1);
+
+  const closedRuns = []; // non-training runs that a Trained day later closed
+  let run = 0;
+  for (const t of seq) {
+    if (t === 'trained') {
+      if (run) closedRuns.push(run);
+      run = 0;
+    } else {
+      run += 1;
+    }
+  }
+  const trailing = run; // the run still open at "today", if any
+
+  const quietRuns = closedRuns.filter((n) => n >= MIN_QUIET_DAYS);
+  const ongoing = trailing >= MIN_QUIET_DAYS;
+
+  return {
+    count: quietRuns.length + (ongoing ? 1 : 0),
+    recovered: quietRuns.length,
+    ongoing,
+    longest: Math.max(0, ...quietRuns, ongoing ? trailing : 0),
+    weeks: SEASON_WEEKS,
+  };
 }
