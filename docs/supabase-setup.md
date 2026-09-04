@@ -30,24 +30,58 @@ security so each user only ever sees their own rows.
   - `https://training-log-roan.vercel.app`
   - `http://localhost:5173`
 
-## 4. Wire up the keys
+## 4. Enable realtime (optional but recommended)
 
-**Project Settings → API**. Copy:
+**SQL Editor** → paste the contents of
+[`supabase/migrations/0002_enable_realtime.sql`](../supabase/migrations/0002_enable_realtime.sql)
+→ **Run**. Without this, a second open device still syncs — it just waits
+for its next refocus instead of updating within a second or two.
 
-- **Project URL** → `VITE_SUPABASE_URL`
-- **anon public** key → `VITE_SUPABASE_ANON_KEY`
+## 5. Wire up the keys
+
+**Project Settings → API Keys**. On newer projects this is the "Publishable
+and secret" key system — copy:
+
+- **Project URL** (Project Settings → General, or the API Keys page) →
+  `VITE_SUPABASE_URL`
+- **Publishable key** (`sb_publishable_...`) → `VITE_SUPABASE_ANON_KEY`
+
+(Older projects instead show a plain **anon public** JWT under "Legacy anon,
+service_role API keys" — that works the same way.) Never use the **Secret**
+/ `service_role` key here; that one bypasses RLS and belongs server-side
+only, which this app doesn't have.
 
 Local: `cp .env.example .env.local` and paste them in. Restart `npm run dev`.
 
 Vercel: **Project → Settings → Environment Variables**, add the same two
 (all environments), then redeploy.
 
-Both keys are safe in a client bundle — the anon key can only do what RLS
-allows, which is "read and write your own rows once you're signed in".
+Both keys are safe in a client bundle — the publishable/anon key can only do
+what RLS allows, which is "read and write your own rows once you're signed
+in".
+
+## 6. Your own email sender (recommended)
+
+Supabase's built-in mailer is rate-limited to a handful of emails per hour —
+fine for the first test, not for actually using the app. **Authentication →
+SMTP Settings** → enable custom SMTP. [Resend](https://resend.com)'s free
+tier works without verifying a domain, as long as you sign up for Resend
+with the *same* email you'll sign into the app with (their sandbox only
+delivers to the account owner's address until a domain is verified):
+
+| Field | Value |
+|---|---|
+| Sender email | `onboarding@resend.dev` |
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | *(a Resend API key)* |
 
 ## Conflict model
 
 `localStorage` is the working copy: every read and write is local and
 instant, online or off. When you're signed in, each change also upserts to
 Supabase, and on load the two are merged **last-write-wins per day** using
-a client `updatedAt` stamp. Prefs merge the same way on the whole object.
+a client `updatedAt` stamp. Prefs merge the same way on the whole object. A
+realtime subscription (step 4) speeds up when a second device notices — the
+merge logic itself doesn't depend on it.

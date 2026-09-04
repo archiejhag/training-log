@@ -13,14 +13,19 @@ import { mergeDays, mergePrefs } from '../lib/sync';
    2. After that first merge, every local change is pushed to Supabase,
       debounced so a burst of edits (typing in a textarea) becomes one
       request, not one per keystroke.
-   3. If a push fails (offline), nothing is lost — the unsynced day just
+   3. A Realtime subscription on `days`/`prefs` means a change from another
+      device arrives within about half a second, not at the next refocus —
+      any event on either table just triggers the same pull-and-merge.
+   4. If a push fails (offline), nothing is lost — the unsynced day just
       keeps a newer `updatedAt` than what's in Supabase, so the very next
-      successful pull-and-merge (reconnect, reopen, refocus) finds it and
-      pushes it then. There's no separate queue to lose track of.
+      successful pull-and-merge (reconnect, reopen, refocus, a realtime
+      event) finds it and pushes it then. There's no separate queue to
+      lose track of.
 
    Returns `{ status, error }` purely for a status line in Settings. */
 
 const DEBOUNCE_MS = 800;
+const REALTIME_DEBOUNCE_MS = 500;
 const REFOCUS_THROTTLE_MS = 30_000;
 
 async function fetchRemote(userId) {
@@ -79,6 +84,7 @@ export function useSync({ user, allData, replaceAll }) {
   const debounceRef = useRef(null);
   const pullingRef = useRef(false);
   const lastPulledAtRef = useRef(0);
+  const realtimeDebounceRef = useRef(null);
 
   const pushDiff = useCallback(async (uid) => {
     const { days, prefs } = dataRef.current;
@@ -187,6 +193,41 @@ export function useSync({ user, allData, replaceAll }) {
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [user, pushDiff, pullAndMerge]);
+
+  // Live updates: any change to this user's rows — from any device,
+  // including the realtime echo of this device's own push — triggers a
+  // pull-and-merge. Debounced so a burst of remote writes (someone pushing
+  // several days at once) becomes one merge, not one per row. RLS applies
+  // to the subscription itself, so this can only ever see the signed-in
+  // user's own rows.
+  useEffect(() => {
+    if (!supabase || !user) return;
+    const onChange = () => {
+      clearTimeout(realtimeDebounceRef.current);
+      realtimeDebounceRef.current = setTimeout(
+        () => pullAndMerge(user.id),
+        REALTIME_DEBOUNCE_MS,
+      );
+    };
+    const channel = supabase
+      .channel(`sync-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'days', filter: `user_id=eq.${user.id}` },
+        onChange,
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'prefs', filter: `user_id=eq.${user.id}` },
+        onChange,
+      )
+      .subscribe();
+
+    return () => {
+      clearTimeout(realtimeDebounceRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, [user, pullAndMerge]);
 
   return { status, error };
 }
