@@ -1,9 +1,12 @@
 import { useState } from 'react';
 
 /* The "Sync across devices" card in Settings. Renders nothing unless this
-   build has Supabase keys. Sign-in is a magic link — one email field, no
-   password. Once signed in, it also shows the sync engine's own status
-   (useSync) — synced / syncing / an error worth knowing about. */
+   build has Supabase keys. Sign-in sends one email with two ways in: a
+   magic link, and a 6-digit code — the code matters on a home-screen PWA,
+   where the link opens in a different storage context (Safari) than the
+   installed icon, so tapping it doesn't actually sign the icon in. Once
+   signed in, this also shows the sync engine's own status (useSync) —
+   synced / syncing / an error worth knowing about. */
 
 const SYNC_LABEL = {
   syncing: 'Syncing…',
@@ -12,8 +15,17 @@ const SYNC_LABEL = {
 };
 
 export default function SyncPanel({ auth, sync }) {
-  const { syncAvailable, user, status: authStatus, error: authError, signIn, signOut } = auth;
+  const {
+    syncAvailable,
+    user,
+    status: authStatus,
+    error: authError,
+    signIn,
+    verifyCode,
+    signOut,
+  } = auth;
   const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
 
   if (!syncAvailable) return null;
 
@@ -49,13 +61,39 @@ export default function SyncPanel({ auth, sync }) {
       ) : authStatus === 'sent' ? (
         <>
           <p className="sub">
-            Check your inbox — a sign-in link is on its way to <b>{email}</b>.
-            Open it on any device to sync there.
+            Check your inbox for a message to <b>{email}</b> — tap the link,
+            or type the 6-digit code from the same email below. On a
+            home-screen icon, the code is the reliable one: the link opens in
+            your browser, which isn't the same signed-in app as the icon.
           </p>
+          <form
+            className="sync-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (code.trim()) verifyCode(email, code);
+            }}
+          >
+            <input
+              className="sync-email"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="6-digit code"
+              aria-label="6-digit code from the email"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            <button type="submit" className="ghost-btn" disabled={!code.trim()}>
+              Verify
+            </button>
+          </form>
           <button
             type="button"
             className="link-btn"
-            onClick={() => setEmail('')}
+            onClick={() => {
+              setEmail('');
+              setCode('');
+            }}
           >
             Use a different email
           </button>

@@ -5,8 +5,15 @@ import { supabase, syncAvailable } from '../lib/supabase';
    every field is inert and `syncAvailable` is false — callers render the
    local-only app and never show the sync UI.
 
-   Sign-in is a magic link: enter an email, get a one-time link, land back
-   here signed in. No passwords anywhere. */
+   Sign-in sends one email with two ways to use it: a magic link, and a
+   6-digit code (verifyCode). No passwords anywhere.
+
+   The code matters more than it looks. A home-screen PWA on iOS has its
+   own storage, walled off from Safari — and the email link always opens
+   in Safari (or whatever the default browser is), never inside the
+   installed icon. So tapping the link signs you in over there, while the
+   icon you actually use never sees it. Typing the code instead never
+   leaves the app, so there's no hand-off to lose the session in. */
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -40,6 +47,19 @@ export function useAuth() {
     else setStatus('sent');
   }, []);
 
+  const verifyCode = useCallback(async (email, token) => {
+    if (!supabase) return;
+    setError(null);
+    const { error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: token.trim(),
+      type: 'email',
+    });
+    // On success, onAuthStateChange fires with the new session and updates
+    // status/user itself — nothing else to do here.
+    if (err) setError(err.message);
+  }, []);
+
   const signOut = useCallback(async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
@@ -47,5 +67,5 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  return { syncAvailable, user, status, error, signIn, signOut };
+  return { syncAvailable, user, status, error, signIn, verifyCode, signOut };
 }

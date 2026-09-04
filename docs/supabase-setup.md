@@ -21,7 +21,8 @@ security so each user only ever sees their own rows.
 ## 3. Enable email sign-in
 
 **Authentication → Providers → Email**: make sure it's enabled. Leave
-"Confirm email" on. No password — the app uses magic links.
+"Confirm email" on. No password — sign-in is a magic link *and* a 6-digit
+code, sent in the same email.
 
 **Authentication → URL Configuration**:
 
@@ -29,6 +30,15 @@ security so each user only ever sees their own rows.
 - **Redirect URLs**: add both
   - `https://training-log-roan.vercel.app`
   - `http://localhost:5173`
+
+**Authentication → Email Templates → Magic Link**: add `{{ .Token }}`
+somewhere in the body (e.g. "Or enter this code: `{{ .Token }}`"). Without
+this the email only contains the link, and the code field in Settings has
+nothing to verify. The code matters more than it looks — see the note in
+`useAuth.js`, but in short: a home-screen PWA on iOS has separate storage
+from Safari, and the link always opens in Safari, so tapping it signs in
+the *browser*, not the installed icon. Typing the code never leaves the
+app, so it doesn't hit that problem.
 
 ## 4. Enable realtime (optional but recommended)
 
