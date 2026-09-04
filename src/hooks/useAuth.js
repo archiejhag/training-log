@@ -6,7 +6,9 @@ import { supabase, syncAvailable } from '../lib/supabase';
    local-only app and never show the sync UI.
 
    Sign-in sends one email with two ways to use it: a magic link, and a
-   6-digit code (verifyCode). No passwords anywhere.
+   numeric code (verifyCode). No passwords anywhere. The code's length is
+   a Supabase project setting (6 or 8 digits, commonly) — the app never
+   assumes one.
 
    The code matters more than it looks. A home-screen PWA on iOS has its
    own storage, walled off from Safari — and the email link always opens

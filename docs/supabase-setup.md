@@ -21,7 +21,7 @@ security so each user only ever sees their own rows.
 ## 3. Enable email sign-in
 
 **Authentication → Providers → Email**: make sure it's enabled. Leave
-"Confirm email" on. No password — sign-in is a magic link *and* a 6-digit
+"Confirm email" on. No password — sign-in is a magic link *and* a numeric
 code, sent in the same email.
 
 **Authentication → URL Configuration**:
