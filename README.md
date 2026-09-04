@@ -1,5 +1,7 @@
 # Training Log
 
+[![CI](https://github.com/archiejhag/training-log/actions/workflows/ci.yml/badge.svg)](https://github.com/archiejhag/training-log/actions/workflows/ci.yml)
+
 A training habit-tracker built for real-life inconsistency — three honest daily
 states, no streaks, no guilt dashboards.
 
@@ -57,6 +59,21 @@ To turn on cross-device sync via Supabase, follow
 [`docs/supabase-setup.md`](docs/supabase-setup.md) — create a project, run
 `supabase/migrations/0001_init.sql`, and set `VITE_SUPABASE_URL` /
 `VITE_SUPABASE_ANON_KEY`.
+
+### CI & performance budget
+
+Every push to `main` (and every PR) runs lint, the Vitest suite, a
+production build, and a [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
+pass against that build — see
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml). The Lighthouse step
+fails the build if the shipped JS/total weight grows past the ceilings in
+[`.lighthouserc.cjs`](.lighthouserc.cjs), or if accessibility / best-practices
+regress — that file explains where the numbers came from and how to
+re-baseline them deliberately. Run the whole thing locally with:
+
+```bash
+npm run ci
+```
 
 ## Stack
 
