@@ -37,8 +37,6 @@ export default function FriendsPanel({ auth, friends, onViewFriend, viewError })
       <h2>Friends</h2>
       <p className="sub">
         Add a friend by email to look through what they've been training.
-        Just their board, the way you'd look at your own — no counts
-        compared, no ranking.
       </p>
 
       <form className="sync-form" onSubmit={handleAdd}>
