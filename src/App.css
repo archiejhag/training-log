@@ -714,6 +714,32 @@
   color: var(--on-accent);
 }
 
+/* free-text field, shown only when "Other" is the pick */
+.reason-text {
+  width: 100%;
+  margin-top: 10px;
+  appearance: none;
+  background: var(--field);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  padding: 8px 10px;
+  color: var(--chalk);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  animation: fadeIn 0.2s ease;
+  transition: border-color 0.15s ease;
+}
+
+.reason-text::placeholder {
+  color: var(--chalk-dim);
+  opacity: 0.8;
+}
+
+.reason-text:focus {
+  outline: none;
+  border-color: rgba(201, 154, 74, 0.55);
+}
+
 /* ---- Check-in: session-type chips (only when Trained) ---------- */
 
 .type-block {

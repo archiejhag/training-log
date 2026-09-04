@@ -35,6 +35,7 @@ export default function App() {
     getDay,
     setTier,
     setReason,
+    setReasonText,
     setType,
     setNote,
     setExercises,
@@ -279,6 +280,7 @@ export default function App() {
               dateLabel={weekdayName(selectedDate)}
               onTier={(tier) => setTier(selectedDate, tier)}
               onReason={(reason) => setReason(selectedDate, reason)}
+              onReasonText={(text) => setReasonText(selectedDate, text)}
               onType={(type) => setType(selectedDate, type)}
               onNote={(note) => setNote(selectedDate, note)}
               onOpenLog={() => setView('log')}

@@ -71,6 +71,16 @@ describe('setTier', () => {
     expect(result.current.getDay('d').exercises).toEqual(ex);
   });
 
+  test('the free-text reason is dropped when a day stops being skipped', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'skipped'));
+    act(() => result.current.setReason('d', 'other'));
+    act(() => result.current.setReasonText('d', 'shoulder flared up'));
+    expect(result.current.getDay('d').reasonText).toBe('shoulder flared up');
+    act(() => result.current.setTier('d', 'rest'));
+    expect(result.current.getDay('d').reasonText).toBe('');
+  });
+
   test('the session type is dropped when a day stops being trained', () => {
     const { result } = renderHook(() => useTrainingLog());
     act(() => result.current.setTier('d', 'trained'));
@@ -97,6 +107,27 @@ describe('setType', () => {
     expect(result.current.getDay('d').type).toBe('pull');
     act(() => result.current.setType('d', null));
     expect(result.current.getDay('d').type).toBe(null);
+  });
+});
+
+describe('setReason / setReasonText', () => {
+  test('picking a preset reason clears any free text', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'skipped'));
+    act(() => result.current.setReason('d', 'other'));
+    act(() => result.current.setReasonText('d', 'car broke down'));
+    act(() => result.current.setReason('d', 'busy'));
+    expect(result.current.getDay('d').reason).toBe('busy');
+    expect(result.current.getDay('d').reasonText).toBe('');
+  });
+
+  test('free text stays while "other" stays the pick', () => {
+    const { result } = renderHook(() => useTrainingLog());
+    act(() => result.current.setTier('d', 'skipped'));
+    act(() => result.current.setReason('d', 'other'));
+    act(() => result.current.setReasonText('d', 'moving house'));
+    act(() => result.current.setReason('d', 'other'));
+    expect(result.current.getDay('d').reasonText).toBe('moving house');
   });
 });
 

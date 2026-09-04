@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { REASONS } from '../lib/reasons';
 
 /* Shown above the check-in card when yesterday was never marked.
 
@@ -8,18 +9,13 @@ import { useState } from 'react';
 
    Yesterday isn't actually written until the flow finishes, so the prompt
    stays mounted through the reason step. Trained / Rest / Done / a chip all
-   commit and close; × closes without writing anything. */
+   commit and close; × closes without writing anything. The quick path skips
+   the free-text on "Other" — you can add that later from the main card. */
 
 const TIERS = [
   { id: 'trained', label: 'Trained' },
   { id: 'skipped', label: 'Skipped' },
   { id: 'rest', label: 'Rest' },
-];
-
-const REASONS = [
-  { id: 'busy', label: 'Busy' },
-  { id: 'notfeelingit', label: 'Not feeling it' },
-  { id: 'other', label: 'Other' },
 ];
 
 export default function CatchUp({ dateLabel, onMark, onSkip, onDismiss }) {

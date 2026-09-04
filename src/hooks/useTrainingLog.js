@@ -7,13 +7,15 @@ import { useState, useEffect, useCallback } from 'react';
 
    Stored shape:
      {
-       days:  { "YYYY-MM-DD": { tier, reason, type, note, freeform, exercises } },
+       days:  { "YYYY-MM-DD": { tier, reason, reasonText, type, note, freeform, exercises } },
        prefs: { catchUpDismissedFor?, ... }   // app-wide settings, grows over time
      }
    (`type` — push/pull/legs/cardio/mobility — is optional and only meaningful
-   on a Trained day. `note` is a short freeform line that belongs to any day,
-   whatever its tier. `freeform` is the longer "just type what I did" block —
-   an alternative to the structured `exercises` list on a Trained day.)
+   on a Trained day. `reason` is a skip-reason id; `reasonText` is the free
+   text captured only when the reason is "other". `note` is a short freeform
+   line that belongs to any day, whatever its tier. `freeform` is the longer
+   "just type what I did" block — an alternative to the structured
+   `exercises` list on a Trained day.)
 */
 
 const STORAGE_KEY = 'training-log/v1';
@@ -25,6 +27,7 @@ export function blankDay() {
   return {
     tier: null,
     reason: null,
+    reasonText: '',
     type: null,
     note: '',
     freeform: '',
@@ -85,8 +88,10 @@ export function useTrainingLog() {
       const next = current.tier === tier ? null : tier;
       patchDay(key, {
         tier: next,
-        // A reason only belongs to a "skipped" day; a type to a "trained" one.
+        // A reason (and its free text) only belongs to a "skipped" day;
+        // a type to a "trained" one.
         reason: next === 'skipped' ? current.reason : null,
+        reasonText: next === 'skipped' ? current.reasonText ?? '' : '',
         type: next === 'trained' ? current.type ?? null : null,
       });
     },
@@ -94,7 +99,18 @@ export function useTrainingLog() {
   );
 
   const setReason = useCallback(
-    (key, reason) => patchDay(key, { reason }),
+    // The free text only makes sense while "other" is the pick — clear it
+    // whenever the reason moves to a preset or is toggled off.
+    (key, reason) =>
+      patchDay(key, {
+        reason,
+        ...(reason === 'other' ? {} : { reasonText: '' }),
+      }),
+    [patchDay],
+  );
+
+  const setReasonText = useCallback(
+    (key, reasonText) => patchDay(key, { reasonText }),
     [patchDay],
   );
 
@@ -141,6 +157,7 @@ export function useTrainingLog() {
     getDay,
     setTier,
     setReason,
+    setReasonText,
     setType,
     setNote,
     setExercises,

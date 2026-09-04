@@ -1,4 +1,5 @@
 import { summariseExercise } from '../lib/format';
+import { REASONS, CUSTOM_REASON } from '../lib/reasons';
 
 /* The "Mark today" card. Three equal-weight tiers, an optional reason when
    you skip, and — only when you've marked Trained — a gentle nudge toward
@@ -8,12 +9,6 @@ const TIERS = [
   { id: 'trained', label: 'Trained', desc: 'Session done' },
   { id: 'skipped', label: 'Skipped', desc: "Didn't happen" },
   { id: 'rest', label: 'Rest', desc: 'Planned day off' },
-];
-
-const REASONS = [
-  { id: 'busy', label: 'Busy' },
-  { id: 'notfeelingit', label: 'Not feeling it' },
-  { id: 'other', label: 'Other' },
 ];
 
 const TYPES = [
@@ -31,6 +26,7 @@ export default function CheckIn({
   dateLabel,
   onTier,
   onReason,
+  onReasonText,
   onType,
   onNote,
   onOpenLog,
@@ -87,6 +83,17 @@ export default function CheckIn({
               </button>
             ))}
           </div>
+          {day.reason === CUSTOM_REASON && (
+            <input
+              className="reason-text"
+              type="text"
+              maxLength={60}
+              placeholder="In a word or two — optional"
+              aria-label="Your reason"
+              value={day.reasonText ?? ''}
+              onChange={(e) => onReasonText(e.target.value)}
+            />
+          )}
         </div>
       )}
 
