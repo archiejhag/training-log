@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import * as friendsApi from '../lib/friends';
+
+const REALTIME_DEBOUNCE_MS = 500;
 
 /* Friend requests and the accepted-friends list. Inert (empty list, no
    requests possible) when sync isn't configured or nobody's signed in —
@@ -31,6 +33,48 @@ export function useFriends(user) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // Live updates: a request arriving, being accepted/declined, or a friend
+  // removing you — from any device — should show up without a reload.
+  // Two filters because a row involves this user as either party, and a
+  // realtime filter can only test one column. Debounced so an accept and
+  // its follow-on row changes collapse into one refresh, not several.
+  const realtimeDebounceRef = useRef(null);
+  useEffect(() => {
+    if (!supabase || !user) return;
+    const onChange = () => {
+      clearTimeout(realtimeDebounceRef.current);
+      realtimeDebounceRef.current = setTimeout(refresh, REALTIME_DEBOUNCE_MS);
+    };
+    const channel = supabase
+      .channel(`friendships-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'friendships',
+          filter: `requester_id=eq.${user.id}`,
+        },
+        onChange,
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'friendships',
+          filter: `addressee_id=eq.${user.id}`,
+        },
+        onChange,
+      )
+      .subscribe();
+
+    return () => {
+      clearTimeout(realtimeDebounceRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, [user, refresh]);
 
   const addFriend = useCallback(
     async (email) => {
