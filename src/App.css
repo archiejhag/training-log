@@ -389,6 +389,11 @@
   padding-right: 34px;
 }
 
+/* observation-only card: nothing sits under the paragraph */
+.nudge-text-only {
+  margin: 0;
+}
+
 .nudge-actions {
   display: flex;
   align-items: center;

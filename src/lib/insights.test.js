@@ -1,22 +1,35 @@
 import { describe, test, expect } from 'vitest';
-import { busyStretch } from './insights';
+import { busyStretch, reasonPattern } from './insights';
 
 const TODAY = '2026-09-15';
+
+const keyForAgo = (ago) => {
+  const d = new Date(2026, 8, 15); // local 2026-09-15
+  d.setDate(d.getDate() - ago);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 // Build a `days` map: pass offsets-back-from-today and the tier for each.
 function days(entries) {
   const out = {};
-  for (const [ago, tier] of entries) {
-    const d = new Date(2026, 8, 15); // local 2026-09-15
-    d.setDate(d.getDate() - ago);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    out[key] = { tier };
+  for (const [ago, tier] of entries) out[keyForAgo(ago)] = { tier };
+  return out;
+}
+
+// Build a `days` map of Skipped days with reasons: [ago, reason] pairs.
+function reasonDays(entries) {
+  const out = {};
+  for (const [ago, reason] of entries) {
+    out[keyForAgo(ago)] = { tier: 'skipped', reason };
   }
   return out;
 }
 
 const skipDays = (n, startAgo = 1) =>
   Array.from({ length: n }, (_, i) => [startAgo + i, 'skipped']);
+
+const reasonRun = (n, reason, startAgo = 1) =>
+  Array.from({ length: n }, (_, i) => [startAgo + i, reason]);
 
 describe('busyStretch', () => {
   test('no bar set → never offers', () => {
@@ -87,5 +100,80 @@ describe('busyStretch', () => {
       { bar: 3, today: TODAY },
     );
     expect(r).toMatchObject({ offer: false, skips: 1 });
+  });
+});
+
+describe('reasonPattern', () => {
+  test('fewer than three of a reason → nothing to say', () => {
+    const r = reasonPattern(reasonDays(reasonRun(2, 'busy')), { today: TODAY });
+    expect(r).toMatchObject({ show: false, count: 2, reason: 'busy' });
+  });
+
+  test('three "Busy" skips in the window → surfaces it', () => {
+    const r = reasonPattern(reasonDays(reasonRun(3, 'busy')), { today: TODAY });
+    expect(r).toMatchObject({ show: true, reason: 'busy', count: 3 });
+  });
+
+  test('three "Not feeling it" skips → surfaces that reason', () => {
+    const r = reasonPattern(reasonDays(reasonRun(4, 'notfeelingit')), {
+      today: TODAY,
+    });
+    expect(r).toMatchObject({ show: true, reason: 'notfeelingit', count: 4 });
+  });
+
+  test('the more frequent reason wins', () => {
+    const r = reasonPattern(
+      reasonDays([...reasonRun(4, 'busy', 1), ...reasonRun(3, 'notfeelingit', 6)]),
+      { today: TODAY },
+    );
+    expect(r).toMatchObject({ show: true, reason: 'busy', count: 4 });
+  });
+
+  test('a tie breaks toward "busy"', () => {
+    const r = reasonPattern(
+      reasonDays([...reasonRun(3, 'notfeelingit', 1), ...reasonRun(3, 'busy', 5)]),
+      { today: TODAY },
+    );
+    expect(r).toMatchObject({ show: true, reason: 'busy', count: 3 });
+  });
+
+  test('"Other" and unspecified reasons are not patterns', () => {
+    expect(
+      reasonPattern(reasonDays(reasonRun(5, 'other')), { today: TODAY }),
+    ).toMatchObject({ show: false, reason: null, count: 0 });
+    expect(
+      reasonPattern(reasonDays(reasonRun(5, null)), { today: TODAY }),
+    ).toMatchObject({ show: false });
+  });
+
+  test('reasons older than the window are ignored', () => {
+    const r = reasonPattern(reasonDays(reasonRun(3, 'busy', 14)), {
+      today: TODAY,
+    });
+    expect(r).toMatchObject({ show: false, count: 0 });
+  });
+
+  test('a reason on a non-skipped day does not count', () => {
+    const mixed = {
+      ...reasonDays(reasonRun(2, 'busy')),
+      [keyForAgo(4)]: { tier: 'trained', reason: 'busy' },
+    };
+    expect(reasonPattern(mixed, { today: TODAY }).count).toBe(2);
+  });
+
+  test('dismissed within the snooze period → silent', () => {
+    const r = reasonPattern(reasonDays(reasonRun(4, 'busy')), {
+      today: TODAY,
+      dismissedAt: '2026-09-09', // 6 days ago
+    });
+    expect(r.show).toBe(false);
+  });
+
+  test('dismissed longer ago than the snooze period → surfaces again', () => {
+    const r = reasonPattern(reasonDays(reasonRun(4, 'busy')), {
+      today: TODAY,
+      dismissedAt: '2026-08-30', // 16 days ago
+    });
+    expect(r.show).toBe(true);
   });
 });

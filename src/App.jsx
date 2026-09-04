@@ -10,9 +10,10 @@ import {
   weekdayName,
 } from './lib/date';
 import { newId } from './lib/id';
-import { busyStretch } from './lib/insights';
+import { busyStretch, reasonPattern } from './lib/insights';
 import CatchUp from './components/CatchUp';
 import BusyNudge from './components/BusyNudge';
+import ReasonPatternNote from './components/ReasonPatternNote';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import MonthView from './components/MonthView';
@@ -148,6 +149,19 @@ export default function App() {
   };
   const dismissBusyNudge = () => setPref('busyNudgeSeenAt', today);
 
+  // A recurring skip reason, named once. Yields to the busy-stretch offer so
+  // the two cards never show together.
+  const reasonNote = useMemo(
+    () =>
+      reasonPattern(allData.days, {
+        today,
+        dismissedAt: prefs.reasonPatternSeenAt,
+      }),
+    [allData.days, today, prefs.reasonPatternSeenAt],
+  );
+  const showReasonNote = !busy.offer && reasonNote.show;
+  const dismissReasonNote = () => setPref('reasonPatternSeenAt', today);
+
   // Don't nag a brand-new user about "yesterday" — only offer catch-up once
   // there's some history to catch up to.
   const hasHistory = Object.keys(allData.days).length > 0;
@@ -240,6 +254,14 @@ export default function App() {
                 suggestedBar={busy.suggestedBar}
                 onAccept={acceptBusyNudge}
                 onDismiss={dismissBusyNudge}
+              />
+            )}
+
+            {showReasonNote && (
+              <ReasonPatternNote
+                reason={reasonNote.reason}
+                count={reasonNote.count}
+                onDismiss={dismissReasonNote}
               />
             )}
 
