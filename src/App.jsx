@@ -18,6 +18,7 @@ import { busyStretch, reasonPattern, isReEntry } from './lib/insights';
 import CatchUp from './components/CatchUp';
 import BusyNudge from './components/BusyNudge';
 import ReasonPatternNote from './components/ReasonPatternNote';
+import FriendNotifications from './components/FriendNotifications';
 import CheckIn from './components/CheckIn';
 import WeeklyView from './components/WeeklyView';
 import MonthView from './components/MonthView';
@@ -95,6 +96,16 @@ export default function App() {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = prefs.theme === 'light' ? '#ecebe3' : '#2a2d2b';
   }, [prefs.theme]);
+
+  // Seed a starting point for the "friend accepted" home-screen notice, once,
+  // so shipping this doesn't dump every already-accepted friendship as if it
+  // just happened.
+  useEffect(() => {
+    if (prefs.friendAcceptedSeenAt == null) {
+      setPref('friendAcceptedSeenAt', new Date().toISOString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Every exercise name used before, most-recently-used first, deduped
   // case-insensitively (keeping the casing it was first typed in).
@@ -194,6 +205,9 @@ export default function App() {
   );
   const showReasonNote = !busy.offer && reasonNote.show;
   const dismissReasonNote = () => setPref('reasonPatternSeenAt', today);
+
+  const dismissAcceptedNotice = () =>
+    setPref('friendAcceptedSeenAt', new Date().toISOString());
 
   // Settings -> "Clear all". Wipes the cloud copy first (if signed in),
   // then local — see useSync's clearRemote for why that order, and the
@@ -313,6 +327,14 @@ export default function App() {
                 onDismiss={dismissReasonNote}
               />
             )}
+
+            <FriendNotifications
+              friendships={friends.friendships}
+              friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
+              onRespond={friends.respond}
+              onViewFriend={openFriendLog}
+              onDismissAccepted={dismissAcceptedNotice}
+            />
 
             <CheckIn
               day={day}
