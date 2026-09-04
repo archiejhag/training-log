@@ -11,8 +11,9 @@ make it honest.
 Where the app is today: Phases 0 through 4 below are all shipped — the core
 loop, the chalk visual identity, structured logging, the adaptive layer
 (bar, busy-stretch detection, gaps-are-normal view), and optional cloud sync
-via Supabase with CI and a performance budget behind it. **Phase 5**, at the
-bottom, is what's next: mainly finishing the visual craft in corners the
+via Supabase with CI and a performance budget behind it. A first version of
+Friends also shipped, outside this document. **Phase 5** hardens that;
+**Phase 6** is mostly finishing the visual craft in corners the
 faster-moving later phases didn't get to, not new product surface.
 
 ---
@@ -140,7 +141,33 @@ actually open every day.
 - **Write the case study** `[High · S]` — the one-paragraph pitch, two screenshots,
   and the "no streaks, no ranked tiers" decision written up.
 
-## Phase 5 — Aesthetic polish
+## Phase 5 — Friends, done properly
+
+Friends shipped as a first version outside this roadmap (added by email,
+view-only, a friend currently sees every marked day's tier — Trained,
+Skipped, or Rest — plus session type and exercises; never a reason or a
+note). This phase is about hardening that: better ways to find people,
+control over what they see, and less reliance on Settings as the only
+place anything friend-related happens.
+
+- **In-app notifications** `[Med · M]` — friend requests, acceptances, and
+  other prompts show up inside the app itself (a badge or a small inbox),
+  not something you only discover by happening to open Settings. Keeps
+  the whole loop self-contained instead of leaning on email as the only
+  signal that something happened.
+- **Friend visibility controls** `[High · S]` — a Settings toggle for how
+  much of your board a friend can see. Default changes to Trained and
+  Rest days only; Skipped days disappear from a friend's view entirely
+  unless you choose to show more. Right now every marked day shows on a
+  friend's grid regardless of tier — reasons and notes were already kept
+  private, but the skip itself wasn't.
+- **Usernames, and add-by-username** `[Med · M]` — choose a username the
+  first time you sign in; add a friend by username instead of having to
+  know their exact email. Needs a small `profiles` table (a unique
+  username tied to your account) and a lookup function alongside the
+  current email-based `request_friend`.
+
+## Phase 6 — Aesthetic polish
 
 Mostly finishing, not adding. Phases 2–4 moved fast and shipped real
 functionality; a few corners have plainer styling than the weekly strip's
