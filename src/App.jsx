@@ -3,6 +3,8 @@ import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
 import { useAuth } from './hooks/useAuth';
 import { useSync } from './hooks/useSync';
+import { useFriends } from './hooks/useFriends';
+import { getFriendDays } from './lib/friends';
 import {
   todayKey,
   yesterdayKey,
@@ -22,6 +24,7 @@ import MonthView from './components/MonthView';
 import SeasonView from './components/SeasonView';
 import TrainingLog from './components/TrainingLog';
 import Settings from './components/Settings';
+import FriendLog from './components/FriendLog';
 
 /* App owns:
    1. which view is on screen ('home' or the training-log detail screen)
@@ -50,11 +53,28 @@ export default function App() {
 
   const auth = useAuth();
   const sync = useSync({ user: auth.user, allData, replaceAll });
+  const friends = useFriends(auth.user);
 
-  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings'
+  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friend'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
   const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
+  const [friendView, setFriendView] = useState(null); // { email, days } | null
+  const [friendViewError, setFriendViewError] = useState(null);
+
+  // Opens a friend's log read-only. get_friend_days (RLS + a security
+  // definer function) is what actually enforces "only if accepted" and
+  // strips reason/note before this ever reaches the client.
+  const openFriendLog = async (friendship) => {
+    setFriendViewError(null);
+    try {
+      const days = await getFriendDays(friendship.friend_id);
+      setFriendView({ email: friendship.friend_email, days });
+      setView('friend');
+    } catch (e) {
+      setFriendViewError(e.message ?? "Could not open that friend's log");
+    }
+  };
 
   // Which day starts the week, for every display that lays days out in a
   // row (weekly strip, month grid, term view). "same weekday" matching
@@ -349,6 +369,9 @@ export default function App() {
             onClearAll={clearAllData}
             auth={auth}
             sync={sync}
+            friends={friends}
+            onViewFriend={openFriendLog}
+            friendViewError={friendViewError}
             weeklyBar={weeklyBar}
             onWeeklyBar={(n) => setPref('weeklyBar', n)}
             weekStart={weekStart}
@@ -356,6 +379,13 @@ export default function App() {
             theme={prefs.theme === 'light' ? 'light' : 'dark'}
             onTheme={(t) => setPref('theme', t)}
             onBack={() => setView('home')}
+          />
+        ) : view === 'friend' && friendView ? (
+          <FriendLog
+            friend={friendView}
+            today={today}
+            weekStart={weekStart}
+            onBack={() => setView('settings')}
           />
         ) : (
           <TrainingLog

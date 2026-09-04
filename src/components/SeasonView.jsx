@@ -32,6 +32,7 @@ export default function SeasonView({
   weekStart = 'monday',
   historyMode,
   onHistoryMode,
+  showToggle = true,
 }) {
   const DOW = weekDowLabels(weekStart);
   // Oldest week first, the current week last.
@@ -51,9 +52,11 @@ export default function SeasonView({
 
   return (
     <section className="card">
-      <div className="hist-top">
-        <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
-      </div>
+      {showToggle && (
+        <div className="hist-top">
+          <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
+        </div>
+      )}
 
       <h2 className="season-title">The last {SEASON_WEEKS} weeks</h2>
 

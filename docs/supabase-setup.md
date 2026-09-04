@@ -47,7 +47,19 @@ app, so it doesn't hit that problem.
 → **Run**. Without this, a second open device still syncs — it just waits
 for its next refocus instead of updating within a second or two.
 
-## 5. Wire up the keys
+## 5. Friends (optional)
+
+**SQL Editor** → paste the contents of
+[`supabase/migrations/0003_friends.sql`](../supabase/migrations/0003_friends.sql)
+→ **Run**. Adds a `friendships` table and three functions (`request_friend`,
+`list_friendships`, `get_friend_days`) that let a friend view your tier,
+session type, and exercises read-only, once you've both accepted — never
+your skip reasons, notes, or prefs, and never a comparison or count. Every
+friend request needs both people to already have an account (steps 3–5
+below, done once each). Skip this migration entirely if you don't want the
+feature — the rest of the app doesn't reference it.
+
+## 6. Wire up the keys
 
 **Project Settings → API Keys**. On newer projects this is the "Publishable
 and secret" key system — copy:
@@ -70,7 +82,7 @@ Both keys are safe in a client bundle — the publishable/anon key can only do
 what RLS allows, which is "read and write your own rows once you're signed
 in".
 
-## 6. Your own email sender (recommended)
+## 7. Your own email sender (recommended)
 
 Supabase's built-in mailer is rate-limited to a handful of emails per hour —
 fine for the first test, not for actually using the app. **Authentication →

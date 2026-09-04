@@ -2312,3 +2312,78 @@ button.week-stat-btn:focus-visible {
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 12px;
 }
+
+/* ---- Settings: friends ------------------------------------- */
+
+.friend-group {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.friend-group-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  margin: 0 0 10px;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.friend-row + .friend-row {
+  border-top: 1px solid var(--hairline);
+}
+
+.friend-email {
+  font-size: 13px;
+  color: var(--chalk);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ---- Friend's log: read-only session list ------------------- */
+
+.friend-sessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.friend-session {
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.friend-session:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.friend-session-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--chalk-dim);
+  margin: 0 0 8px;
+}
