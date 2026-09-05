@@ -15,7 +15,7 @@ import { weekdayName } from '../lib/date';
 const MAX_SESSIONS = 10;
 
 export default function FriendLog({ friend, today, weekStart, onBack }) {
-  const { email, days } = friend;
+  const { username, days } = friend;
   const getDay = (key) => days[key] ?? { tier: null };
 
   const recentSessions = useMemo(() => {
@@ -38,7 +38,7 @@ export default function FriendLog({ friend, today, weekStart, onBack }) {
       </button>
 
       <p className="eyebrow">Friend's log</p>
-      <h1>{email}</h1>
+      <h1>{username}</h1>
 
       <SeasonView getDay={getDay} today={today} weekStart={weekStart} showToggle={false} />
 

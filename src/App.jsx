@@ -4,6 +4,7 @@ import { useTrainingLog } from './hooks/useTrainingLog';
 import { useAuth } from './hooks/useAuth';
 import { useSync } from './hooks/useSync';
 import { useFriends } from './hooks/useFriends';
+import { useProfile } from './hooks/useProfile';
 import { getFriendDays, friendNotifications } from './lib/friends';
 import {
   todayKey,
@@ -27,6 +28,7 @@ import TrainingLog from './components/TrainingLog';
 import Settings from './components/Settings';
 import FriendLog from './components/FriendLog';
 import FriendsScreen from './components/FriendsScreen';
+import UsernameSetup from './components/UsernameSetup';
 import NotificationsScreen from './components/NotificationsScreen';
 import { FriendsIcon, BellIcon } from './components/Icons';
 
@@ -58,12 +60,13 @@ export default function App() {
   const auth = useAuth();
   const sync = useSync({ user: auth.user, allData, replaceAll });
   const friends = useFriends(auth.user);
+  const profile = useProfile(auth.user);
 
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friends' | 'notifications' | 'friend'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
   const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
-  const [friendView, setFriendView] = useState(null); // { email, days } | null
+  const [friendView, setFriendView] = useState(null); // { username, days } | null
   const [friendViewError, setFriendViewError] = useState(null);
   const [friendViewOrigin, setFriendViewOrigin] = useState('friends'); // where "Back" from a friend's log returns to
 
@@ -76,7 +79,7 @@ export default function App() {
     setFriendViewError(null);
     try {
       const days = await getFriendDays(friendship.friend_id);
-      setFriendView({ email: friendship.friend_email, days });
+      setFriendView({ username: friendship.friend_username, days });
       setFriendViewOrigin(view === 'notifications' ? 'notifications' : 'friends');
       setView('friend');
     } catch (e) {
@@ -295,7 +298,9 @@ export default function App() {
       </svg>
 
       <main className="app">
-        {view === 'home' ? (
+        {auth.status === 'in' && profile.status === 'needed' ? (
+          <UsernameSetup profile={profile} onSignOut={auth.signOut} />
+        ) : view === 'home' ? (
           <>
             <div className="app-top">
               <p className="eyebrow">Training Log</p>

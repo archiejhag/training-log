@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
-/* The "Friends" card in Settings. Renders nothing unless sync is
-   configured and you're signed in — friends are meaningless without an
-   account. Add someone by email; once they accept, "View log" opens their
-   board read-only. No counts, no ranking, anywhere in this card. */
+/* The "Friends" card. Renders nothing unless sync is configured and you're
+   signed in — friends are meaningless without an account. Add someone by
+   username; once they accept, "View log" opens their board read-only. No
+   counts, no ranking, anywhere in this card. */
 
 export default function FriendsPanel({
   auth,
@@ -13,9 +13,9 @@ export default function FriendsPanel({
   showSkipped,
   onShowSkippedChange,
 }) {
-  const { syncAvailable, status: authStatus, user } = auth;
+  const { syncAvailable, status: authStatus } = auth;
   const { friendships, error, addFriend, respond, remove } = friends;
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [sending, setSending] = useState(false);
 
   if (!syncAvailable || authStatus !== 'in') return null;
@@ -26,12 +26,12 @@ export default function FriendsPanel({
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed || trimmed === user?.email) return;
+    const trimmed = username.trim();
+    if (!trimmed) return;
     setSending(true);
     try {
       await addFriend(trimmed);
-      setEmail('');
+      setUsername('');
     } catch {
       // error already surfaced via friends.error
     } finally {
@@ -43,7 +43,7 @@ export default function FriendsPanel({
     <section className="card">
       <h2>Friends</h2>
       <p className="sub">
-        Add a friend by email to look through what they've been training.
+        Add a friend by username to look through what they've been training.
       </p>
 
       <p className="friend-group-label">What friends can see</p>
@@ -73,15 +73,15 @@ export default function FriendsPanel({
       <form className="sync-form" onSubmit={handleAdd}>
         <input
           className="sync-email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder="friend@example.com"
-          aria-label="Friend's email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          autoComplete="off"
+          autoCapitalize="off"
+          placeholder="their username"
+          aria-label="Friend's username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
-        <button type="submit" className="ghost-btn" disabled={!email.trim() || sending}>
+        <button type="submit" className="ghost-btn" disabled={!username.trim() || sending}>
           Add
         </button>
       </form>
@@ -91,7 +91,7 @@ export default function FriendsPanel({
           <p className="friend-group-label">Requests</p>
           {incoming.map((f) => (
             <div className="friend-row" key={f.friendship_id}>
-              <span className="friend-email">{f.friend_email}</span>
+              <span className="friend-username">{f.friend_username}</span>
               <div className="friend-row-actions">
                 <button
                   type="button"
@@ -118,7 +118,7 @@ export default function FriendsPanel({
           <p className="friend-group-label">Waiting on them</p>
           {outgoing.map((f) => (
             <div className="friend-row" key={f.friendship_id}>
-              <span className="friend-email">{f.friend_email}</span>
+              <span className="friend-username">{f.friend_username}</span>
               <button
                 type="button"
                 className="link-btn"
@@ -136,7 +136,7 @@ export default function FriendsPanel({
           <p className="friend-group-label">Friends</p>
           {accepted.map((f) => (
             <div className="friend-row" key={f.friendship_id}>
-              <span className="friend-email">{f.friend_email}</span>
+              <span className="friend-username">{f.friend_username}</span>
               <div className="friend-row-actions">
                 <button
                   type="button"

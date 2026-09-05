@@ -2387,7 +2387,7 @@ button.week-stat-btn:focus-visible {
   border-top: 1px solid var(--hairline);
 }
 
-.friend-email {
+.friend-username {
   font-size: 13px;
   color: var(--chalk);
   min-width: 0;

@@ -1,12 +1,21 @@
 import { supabase } from './supabase';
 
 /* Thin wrappers over the friends-related Supabase RPCs (see
-   supabase/migrations/0003_friends.sql). The actual access control and
-   column filtering happen in Postgres, not here — this file just calls
-   through and shapes the response into what the UI wants. */
+   supabase/migrations/0003_friends.sql and 0005_usernames.sql). The actual
+   access control and column filtering happen in Postgres, not here — this
+   file just calls through and shapes the response into what the UI wants. */
 
-export async function requestFriend(email) {
-  const { error } = await supabase.rpc('request_friend', { friend_email: email });
+// Keep in sync with the `username_format` check in 0005_usernames.sql.
+const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+export function isValidUsername(name) {
+  return USERNAME_PATTERN.test(name);
+}
+
+export async function requestFriend(username) {
+  const { error } = await supabase.rpc('request_friend_by_username', {
+    target_username: username,
+  });
   if (error) throw error;
 }
 

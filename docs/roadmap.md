@@ -8,13 +8,14 @@ make it honest.
 > A styled version of this roadmap lives here:
 > <https://claude.ai/code/artifact/94b7d7fe-5a1e-41e1-bc69-27ce73f9325a>
 
-Where the app is today: Phases 0 through 4 below are all shipped — the core
+Where the app is today: Phases 0 through 5 below are all shipped — the core
 loop, the chalk visual identity, structured logging, the adaptive layer
-(bar, busy-stretch detection, gaps-are-normal view), and optional cloud sync
-via Supabase with CI and a performance budget behind it. A first version of
-Friends also shipped, outside this document. **Phase 5** hardens that;
-**Phase 6** is mostly finishing the visual craft in corners the
-faster-moving later phases didn't get to, not new product surface.
+(bar, busy-stretch detection, gaps-are-normal view), optional cloud sync via
+Supabase with CI and a performance budget behind it, and Friends (add by
+username, in-app notifications, visibility controls over what a friend can
+see). **Phase 6** is what's left — mostly finishing the visual craft in
+corners the faster-moving earlier phases didn't get to, not new product
+surface.
 
 ---
 
@@ -141,14 +142,14 @@ actually open every day.
 - **Write the case study** `[High · S]` — the one-paragraph pitch, two screenshots,
   and the "no streaks, no ranked tiers" decision written up.
 
-## Phase 5 — Friends, done properly
+## Phase 5 — Friends, done properly ✅ shipped
 
 Friends shipped as a first version outside this roadmap (added by email,
 view-only, a friend currently sees every marked day's tier — Trained,
 Skipped, or Rest — plus session type and exercises; never a reason or a
-note). This phase is about hardening that: better ways to find people,
-control over what they see, and less reliance on Settings as the only
-place anything friend-related happens.
+note). This phase hardened that: better ways to find people, control over
+what they see, and less reliance on Settings as the only place anything
+friend-related happens.
 
 - **In-app notifications** `[Med · M]` ✅ shipped — friend requests,
   acceptances, and other prompts show up inside the app itself: inline
@@ -163,11 +164,12 @@ place anything friend-related happens.
   `get_friend_days` itself (not just hidden in the UI) unless you turn on
   "Include skipped". Reasons and notes stay excluded the same way,
   regardless.
-- **Usernames, and add-by-username** `[Med · M]` — choose a username the
-  first time you sign in; add a friend by username instead of having to
-  know their exact email. Needs a small `profiles` table (a unique
-  username tied to your account) and a lookup function alongside the
-  current email-based `request_friend`.
+- **Usernames, and add-by-username** `[Med · M]` ✅ shipped — signing in
+  now gates the app on choosing a username (a `profiles` table, one row
+  per account) before anything else, and a friend is added by that
+  instead of their email. `request_friend_by_username` replaces the old
+  email-based `request_friend` outright; requests, the friends list, and
+  notifications all show a username now, not an email.
 
 ## Phase 6 — Aesthetic polish
 

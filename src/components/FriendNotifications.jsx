@@ -36,7 +36,7 @@ export default function FriendNotifications({
       {incoming.map((f) => (
         <section className="nudge" key={f.friendship_id} aria-label="Friend request">
           <p className="nudge-text">
-            <b>{f.friend_email}</b> wants to be friends.
+            <b>{f.friend_username}</b> wants to be friends.
           </p>
           <div className="nudge-actions">
             <button
@@ -72,7 +72,7 @@ export default function FriendNotifications({
             &times;
           </button>
           <p className="nudge-text">
-            <b>{f.friend_email}</b> accepted your friend request.
+            <b>{f.friend_username}</b> accepted your friend request.
           </p>
           <div className="nudge-actions">
             <button

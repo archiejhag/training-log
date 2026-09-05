@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { shapeFriendDays, friendNotifications } from './friends';
+import { shapeFriendDays, friendNotifications, isValidUsername } from './friends';
 
 describe('shapeFriendDays', () => {
   test('turns rows into a date-keyed map', () => {
@@ -87,5 +87,22 @@ describe('friendNotifications', () => {
     ];
     const { newlyAccepted } = friendNotifications(friendships, null);
     expect(newlyAccepted.map((f) => f.friendship_id)).toEqual(['1']);
+  });
+});
+
+describe('isValidUsername', () => {
+  test('accepts lowercase letters, numbers, and underscores, 3-20 chars', () => {
+    expect(isValidUsername('abc')).toBe(true);
+    expect(isValidUsername('archie_99')).toBe(true);
+    expect(isValidUsername('a'.repeat(20))).toBe(true);
+  });
+
+  test('rejects too short, too long, or disallowed characters', () => {
+    expect(isValidUsername('ab')).toBe(false);
+    expect(isValidUsername('a'.repeat(21))).toBe(false);
+    expect(isValidUsername('Archie')).toBe(false);
+    expect(isValidUsername('archie jhag')).toBe(false);
+    expect(isValidUsername('archie@jhag')).toBe(false);
+    expect(isValidUsername('')).toBe(false);
   });
 });
