@@ -216,12 +216,12 @@ export default function App() {
   const dismissAcceptedNotice = () =>
     setPref('friendAcceptedSeenAt', new Date().toISOString());
 
-  // Drives the bell icon's unread dot — same definition of "unread" the
-  // notification cards themselves use, so the dot and the cards never
+  // Drives the bell icon's unread count — same definition of "unread" the
+  // notification cards themselves use, so the badge and the cards never
   // disagree about whether there's something to see.
   const { incoming: notifIncoming, newlyAccepted: notifNewlyAccepted } =
     friendNotifications(friends.friendships, prefs.friendAcceptedSeenAt);
-  const hasNotification = notifIncoming.length > 0 || notifNewlyAccepted.length > 0;
+  const notificationCount = notifIncoming.length + notifNewlyAccepted.length;
 
   // Settings -> "Clear all". Wipes the cloud copy first (if signed in),
   // then local — see useSync's clearRemote for why that order, and the
@@ -311,11 +311,19 @@ export default function App() {
                 <button
                   type="button"
                   className="icon-btn"
-                  aria-label="Notifications"
+                  aria-label={
+                    notificationCount > 0
+                      ? `Notifications (${notificationCount} unread)`
+                      : 'Notifications'
+                  }
                   onClick={() => setView('notifications')}
                 >
                   <BellIcon />
-                  {hasNotification && <span className="icon-dot" aria-hidden="true" />}
+                  {notificationCount > 0 && (
+                    <span className="icon-badge" aria-hidden="true">
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </span>
+                  )}
                 </button>
                 <button
                   type="button"
