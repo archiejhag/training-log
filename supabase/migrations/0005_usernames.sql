@@ -75,6 +75,12 @@ grant execute on function public.request_friend_by_username(text) to authenticat
 -- Also fixes a bug from when in-app notifications were added: responded_at
 -- was never in this function's return table, so the "friend accepted"
 -- notification's date check silently always failed.
+--
+-- Dropped rather than replaced: Postgres won't let `create or replace`
+-- change a function's return columns, only `create or replace` in place
+-- when the shape is identical.
+drop function if exists public.list_friendships();
+
 create or replace function public.list_friendships()
 returns table (
   friendship_id uuid,
