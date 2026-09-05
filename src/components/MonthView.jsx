@@ -24,6 +24,46 @@ export default function MonthView({
   const marked = days.filter((k) => getDay(k).tier).length;
   const firstCol = weekdayIndex(days[0], weekStart); // 0..6, in display order
 
+  // --- draw-on / erase pulse (mirrors WeeklyView) -------------------
+  // When a visible day's tier changes, tag that cell 'in' (just marked)
+  // or 'out' (just cleared) for one animation, then untag it. CSS keys
+  // the keyframes off those classes. Paging months must NOT trigger it,
+  // so we watch `offset` and skip the diff on a month change.
+  const tierSig = days.map((k) => getDay(k).tier ?? '-').join('|');
+  const prevSigRef = useRef(tierSig);
+  const prevOffsetRef = useRef(offset);
+  const [pulse, setPulse] = useState({});
+
+  useEffect(() => {
+    if (prevOffsetRef.current !== offset) {
+      prevOffsetRef.current = offset;
+      prevSigRef.current = tierSig;
+      return;
+    }
+    const prev = prevSigRef.current.split('|');
+    const curr = tierSig.split('|');
+    prevSigRef.current = tierSig;
+
+    const changed = {};
+    days.forEach((key, i) => {
+      if (prev[i] !== undefined && prev[i] !== curr[i]) {
+        changed[key] = curr[i] === '-' ? 'out' : 'in';
+      }
+    });
+    if (!Object.keys(changed).length) return;
+
+    setPulse((p) => ({ ...p, ...changed }));
+    const t = setTimeout(() => {
+      setPulse((p) => {
+        const n = { ...p };
+        Object.keys(changed).forEach((k) => delete n[k]);
+        return n;
+      });
+    }, 450);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tierSig, offset]);
+
   // Roving tabindex: one cell in the tab order, arrows move within the grid.
   const initialFocus = () => {
     const i = days.indexOf(selectedDate);
@@ -113,7 +153,9 @@ export default function MonthView({
               className={
                 'month-cell' +
                 (isToday ? ' is-today' : '') +
-                (isSelected ? ' is-selected' : '')
+                (isSelected ? ' is-selected' : '') +
+                (pulse[key] === 'in' ? ' anim-in' : '') +
+                (pulse[key] === 'out' ? ' anim-out' : '')
               }
               data-tier={d.tier ?? 'none'}
               style={i === 0 ? { gridColumnStart: firstCol + 1 } : undefined}

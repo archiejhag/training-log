@@ -1566,6 +1566,53 @@ button.week-stat-btn:focus-visible {
   height: 14px;
   border-radius: 2px;
   filter: url(#chalk-edge);
+  transform-origin: center;
+  transition: background 0.3s ease;
+}
+
+/* mark a day → the block is drawn on with a small elastic settle;
+   clear a day → a quick sideways wipe. The weekly strip's stroke does
+   the same; this extends it to the grid. prefers-reduced-motion (global
+   rule) zeroes the durations. */
+.month-cell.anim-in .month-mark {
+  animation: month-mark-draw-on 0.42s cubic-bezier(0.33, 1.4, 0.6, 1);
+}
+
+.month-cell.anim-out .month-mark {
+  animation: month-mark-erase 0.34s ease-in;
+}
+
+@keyframes month-mark-draw-on {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.4;
+  }
+  65% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes month-mark-erase {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(2px) skewX(-14deg) scale(0.82);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateX(-6px) skewX(18deg) scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .month-cell[data-tier='none'] .month-mark {
