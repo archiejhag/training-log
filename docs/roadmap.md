@@ -179,10 +179,11 @@ original chalk treatment got, or were only ever checked in one theme. Run
 these through the same four questions as anything else — a visual change
 that adds friction to the daily mark is still wrong.
 
-- **Draw-on motion for the Month view** `[Med · M]` — the weekly strip's
-  marks grow in and erase with real motion; Month view's marks currently
-  just appear and disappear on tap. Same animation, same
-  `prefers-reduced-motion` gate, extended to the grid.
+- **Draw-on motion for the Month view** `[Med · M]` ✅ shipped — a month
+  cell whose tier just changed is drawn on with an elastic settle, or
+  wiped sideways when cleared; the same tier-signature diff WeeklyView
+  uses, so paging months doesn't trigger it and `prefers-reduced-motion`
+  zeroes it.
 - **Whiteboard-theme audit** `[Med · S]` — everything built after the light
   theme shipped (per-set detail, freeform mode, the sync panel, the newer
   Settings cards, the busy-stretch and skip-reason nudges, the term view)
