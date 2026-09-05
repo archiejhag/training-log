@@ -6,7 +6,15 @@ import FriendsPanel from './FriendsPanel';
    just the screen shell plus a sign-in nudge for when there's no account
    to attach friends to yet. */
 
-export default function FriendsScreen({ auth, friends, onViewFriend, friendViewError, onBack }) {
+export default function FriendsScreen({
+  auth,
+  friends,
+  onViewFriend,
+  friendViewError,
+  showSkipped,
+  onShowSkippedChange,
+  onBack,
+}) {
   const { syncAvailable, status: authStatus } = auth;
   const signedIn = syncAvailable && authStatus === 'in';
 
@@ -25,6 +33,8 @@ export default function FriendsScreen({ auth, friends, onViewFriend, friendViewE
           friends={friends}
           onViewFriend={onViewFriend}
           viewError={friendViewError}
+          showSkipped={showSkipped}
+          onShowSkippedChange={onShowSkippedChange}
         />
       ) : (
         <p className="sub">Sign in under Settings to add friends and look through what they've been training.</p>

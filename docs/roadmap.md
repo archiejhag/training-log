@@ -150,17 +150,19 @@ note). This phase is about hardening that: better ways to find people,
 control over what they see, and less reliance on Settings as the only
 place anything friend-related happens.
 
-- **In-app notifications** `[Med · M]` — friend requests, acceptances, and
-  other prompts show up inside the app itself (a badge or a small inbox),
-  not something you only discover by happening to open Settings. Keeps
-  the whole loop self-contained instead of leaning on email as the only
-  signal that something happened.
-- **Friend visibility controls** `[High · S]` — a Settings toggle for how
-  much of your board a friend can see. Default changes to Trained and
-  Rest days only; Skipped days disappear from a friend's view entirely
-  unless you choose to show more. Right now every marked day shows on a
-  friend's grid regardless of tier — reasons and notes were already kept
-  private, but the skip itself wasn't.
+- **In-app notifications** `[Med · M]` ✅ shipped — friend requests,
+  acceptances, and other prompts show up inside the app itself: inline
+  cards on the home screen the moment they happen (via a Supabase
+  Realtime subscription, no reload needed), plus dedicated Friends and
+  Notifications tabs of their own — reachable by icon at all times, with
+  an explicit "nothing yet" rather than staying hidden until there's
+  something to show. A small unread count sits on the bell.
+- **Friend visibility controls** `[High · S]` ✅ shipped — a toggle on the
+  Friends screen for how much of your board a friend can see. Defaults to
+  Trained and Rest days only; Skipped days are excluded from
+  `get_friend_days` itself (not just hidden in the UI) unless you turn on
+  "Include skipped". Reasons and notes stay excluded the same way,
+  regardless.
 - **Usernames, and add-by-username** `[Med · M]` — choose a username the
   first time you sign in; add a friend by username instead of having to
   know their exact email. Needs a small `profiles` table (a unique

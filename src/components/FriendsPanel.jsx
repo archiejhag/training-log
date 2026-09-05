@@ -5,7 +5,14 @@ import { useState } from 'react';
    account. Add someone by email; once they accept, "View log" opens their
    board read-only. No counts, no ranking, anywhere in this card. */
 
-export default function FriendsPanel({ auth, friends, onViewFriend, viewError }) {
+export default function FriendsPanel({
+  auth,
+  friends,
+  onViewFriend,
+  viewError,
+  showSkipped,
+  onShowSkippedChange,
+}) {
   const { syncAvailable, status: authStatus, user } = auth;
   const { friendships, error, addFriend, respond, remove } = friends;
   const [email, setEmail] = useState('');
@@ -37,6 +44,30 @@ export default function FriendsPanel({ auth, friends, onViewFriend, viewError })
       <h2>Friends</h2>
       <p className="sub">
         Add a friend by email to look through what they've been training.
+      </p>
+
+      <p className="friend-group-label">What friends can see</p>
+      <div className="hist-toggle" role="group" aria-label="Skipped days visibility">
+        <button
+          type="button"
+          className={!showSkipped ? 'is-on' : undefined}
+          aria-pressed={!showSkipped}
+          onClick={() => onShowSkippedChange(false)}
+        >
+          Trained &amp; rest only
+        </button>
+        <button
+          type="button"
+          className={showSkipped ? 'is-on' : undefined}
+          aria-pressed={showSkipped}
+          onClick={() => onShowSkippedChange(true)}
+        >
+          Include skipped
+        </button>
+      </div>
+      <p className="sub sub-secondary">
+        Trained and rest days always show. Reasons and notes stay private
+        either way.
       </p>
 
       <form className="sync-form" onSubmit={handleAdd}>

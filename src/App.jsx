@@ -446,6 +446,8 @@ export default function App() {
             friends={friends}
             onViewFriend={openFriendLog}
             friendViewError={friendViewError}
+            showSkipped={prefs.friendShowSkipped === true}
+            onShowSkippedChange={(v) => setPref('friendShowSkipped', v)}
             onBack={() => setView('home')}
           />
         ) : view === 'notifications' ? (

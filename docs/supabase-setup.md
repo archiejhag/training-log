@@ -51,12 +51,16 @@ for its next refocus instead of updating within a second or two.
 
 **SQL Editor** → paste the contents of
 [`supabase/migrations/0003_friends.sql`](../supabase/migrations/0003_friends.sql)
-→ **Run**. Adds a `friendships` table and three functions (`request_friend`,
+→ **Run**, then do the same with
+[`supabase/migrations/0004_friend_visibility.sql`](../supabase/migrations/0004_friend_visibility.sql).
+Adds a `friendships` table and three functions (`request_friend`,
 `list_friendships`, `get_friend_days`) that let a friend view your tier,
 session type, and exercises read-only, once you've both accepted — never
-your skip reasons, notes, or prefs, and never a comparison or count. Every
+your skip reasons, notes, or prefs, and never a comparison or count. By
+default a friend only sees Trained and Rest days; 0004 makes Skipped days
+private unless you turn on "Include skipped" in the Friends screen. Every
 friend request needs both people to already have an account (steps 3–5
-below, done once each). Skip this migration entirely if you don't want the
+below, done once each). Skip both migrations entirely if you don't want the
 feature — the rest of the app doesn't reference it.
 
 ## 6. Wire up the keys
