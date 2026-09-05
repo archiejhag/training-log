@@ -4,7 +4,7 @@ import { useTrainingLog } from './hooks/useTrainingLog';
 import { useAuth } from './hooks/useAuth';
 import { useSync } from './hooks/useSync';
 import { useFriends } from './hooks/useFriends';
-import { getFriendDays } from './lib/friends';
+import { getFriendDays, friendNotifications } from './lib/friends';
 import {
   todayKey,
   yesterdayKey,
@@ -26,6 +26,9 @@ import SeasonView from './components/SeasonView';
 import TrainingLog from './components/TrainingLog';
 import Settings from './components/Settings';
 import FriendLog from './components/FriendLog';
+import FriendsScreen from './components/FriendsScreen';
+import NotificationsScreen from './components/NotificationsScreen';
+import { FriendsIcon, BellIcon } from './components/Icons';
 
 /* App owns:
    1. which view is on screen ('home' or the training-log detail screen)
@@ -56,21 +59,25 @@ export default function App() {
   const sync = useSync({ user: auth.user, allData, replaceAll });
   const friends = useFriends(auth.user);
 
-  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friend'
+  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friends' | 'notifications' | 'friend'
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
   const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
   const [friendView, setFriendView] = useState(null); // { email, days } | null
   const [friendViewError, setFriendViewError] = useState(null);
+  const [friendViewOrigin, setFriendViewOrigin] = useState('friends'); // where "Back" from a friend's log returns to
 
   // Opens a friend's log read-only. get_friend_days (RLS + a security
   // definer function) is what actually enforces "only if accepted" and
-  // strips reason/note before this ever reaches the client.
+  // strips reason/note before this ever reaches the client. Reachable from
+  // both the Friends screen and the Notifications screen, so remember
+  // which one to send "Back" to.
   const openFriendLog = async (friendship) => {
     setFriendViewError(null);
     try {
       const days = await getFriendDays(friendship.friend_id);
       setFriendView({ email: friendship.friend_email, days });
+      setFriendViewOrigin(view === 'notifications' ? 'notifications' : 'friends');
       setView('friend');
     } catch (e) {
       setFriendViewError(e.message ?? "Could not open that friend's log");
@@ -209,6 +216,13 @@ export default function App() {
   const dismissAcceptedNotice = () =>
     setPref('friendAcceptedSeenAt', new Date().toISOString());
 
+  // Drives the bell icon's unread dot — same definition of "unread" the
+  // notification cards themselves use, so the dot and the cards never
+  // disagree about whether there's something to see.
+  const { incoming: notifIncoming, newlyAccepted: notifNewlyAccepted } =
+    friendNotifications(friends.friendships, prefs.friendAcceptedSeenAt);
+  const hasNotification = notifIncoming.length > 0 || notifNewlyAccepted.length > 0;
+
   // Settings -> "Clear all". Wipes the cloud copy first (if signed in),
   // then local — see useSync's clearRemote for why that order, and the
   // brief pause around it.
@@ -285,13 +299,32 @@ export default function App() {
           <>
             <div className="app-top">
               <p className="eyebrow">Training Log</p>
-              <button
-                type="button"
-                className="settings-link"
-                onClick={() => setView('settings')}
-              >
-                Settings
-              </button>
+              <div className="top-actions">
+                <button
+                  type="button"
+                  className="icon-btn"
+                  aria-label="Friends"
+                  onClick={() => setView('friends')}
+                >
+                  <FriendsIcon />
+                </button>
+                <button
+                  type="button"
+                  className="icon-btn"
+                  aria-label="Notifications"
+                  onClick={() => setView('notifications')}
+                >
+                  <BellIcon />
+                  {hasNotification && <span className="icon-dot" aria-hidden="true" />}
+                </button>
+                <button
+                  type="button"
+                  className="settings-link"
+                  onClick={() => setView('settings')}
+                >
+                  Settings
+                </button>
+              </div>
             </div>
             <div className="day-heading">
               <h1>{weekdayName(selectedDate)}</h1>
@@ -391,9 +424,6 @@ export default function App() {
             onClearAll={clearAllData}
             auth={auth}
             sync={sync}
-            friends={friends}
-            onViewFriend={openFriendLog}
-            friendViewError={friendViewError}
             weeklyBar={weeklyBar}
             onWeeklyBar={(n) => setPref('weeklyBar', n)}
             weekStart={weekStart}
@@ -402,12 +432,29 @@ export default function App() {
             onTheme={(t) => setPref('theme', t)}
             onBack={() => setView('home')}
           />
+        ) : view === 'friends' ? (
+          <FriendsScreen
+            auth={auth}
+            friends={friends}
+            onViewFriend={openFriendLog}
+            friendViewError={friendViewError}
+            onBack={() => setView('home')}
+          />
+        ) : view === 'notifications' ? (
+          <NotificationsScreen
+            friendships={friends.friendships}
+            friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
+            onRespond={friends.respond}
+            onViewFriend={openFriendLog}
+            onDismissAccepted={dismissAcceptedNotice}
+            onBack={() => setView('home')}
+          />
         ) : view === 'friend' && friendView ? (
           <FriendLog
             friend={friendView}
             today={today}
             weekStart={weekStart}
-            onBack={() => setView('settings')}
+            onBack={() => setView(friendViewOrigin)}
           />
         ) : (
           <TrainingLog

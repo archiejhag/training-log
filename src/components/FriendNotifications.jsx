@@ -1,5 +1,6 @@
-/* Friend activity, on the home screen — so none of it only lives inside
-   Settings. Two kinds:
+import { friendNotifications } from '../lib/friends';
+
+/* Friend activity. Two kinds:
 
    - An incoming request: shown until you act on it (Accept/Decline), the
      same way CatchUp stays up until you mark yesterday. No separate
@@ -7,6 +8,11 @@
    - "They accepted": a one-time ping. Dismissing (or just going to look
      at their log) clears it via `friendAcceptedSeenAt`, so it doesn't
      linger once you've seen it.
+
+   Used two places: inline on the home screen (silent when there's nothing
+   to flag — the default `emptyState` of null), and on the standalone
+   Notifications screen (pass an `emptyState` node so "nothing yet" says
+   so instead of leaving a blank screen).
 
    Reuses the same card language as CatchUp / BusyNudge. */
 
@@ -16,19 +22,14 @@ export default function FriendNotifications({
   onRespond,
   onViewFriend,
   onDismissAccepted,
+  emptyState = null,
 }) {
-  const incoming = friendships.filter(
-    (f) => f.status === 'pending' && !f.i_am_requester,
-  );
-  const newlyAccepted = friendships.filter(
-    (f) =>
-      f.status === 'accepted' &&
-      f.i_am_requester &&
-      f.responded_at &&
-      (!friendAcceptedSeenAt || f.responded_at > friendAcceptedSeenAt),
+  const { incoming, newlyAccepted } = friendNotifications(
+    friendships,
+    friendAcceptedSeenAt,
   );
 
-  if (incoming.length === 0 && newlyAccepted.length === 0) return null;
+  if (incoming.length === 0 && newlyAccepted.length === 0) return emptyState;
 
   return (
     <>

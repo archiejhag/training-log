@@ -175,6 +175,44 @@
   color: var(--chalk);
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-btn {
+  position: relative;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--chalk-dim);
+  padding: 4px;
+  line-height: 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.icon-btn:hover {
+  color: var(--chalk);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.icon-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
 .app h1 {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;

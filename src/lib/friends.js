@@ -55,3 +55,21 @@ export async function getFriendDays(friendId) {
   if (error) throw error;
   return shapeFriendDays(data);
 }
+
+/** Split a friendships list into what's worth flagging: requests still
+    waiting on you, and acceptances you haven't seen yet. Pure, so both the
+    home-screen nudge and the full Notifications screen (and the icon's
+    unread dot) read the same definition of "unread". */
+export function friendNotifications(friendships, friendAcceptedSeenAt) {
+  const incoming = friendships.filter(
+    (f) => f.status === 'pending' && !f.i_am_requester,
+  );
+  const newlyAccepted = friendships.filter(
+    (f) =>
+      f.status === 'accepted' &&
+      f.i_am_requester &&
+      f.responded_at &&
+      (!friendAcceptedSeenAt || f.responded_at > friendAcceptedSeenAt),
+  );
+  return { incoming, newlyAccepted };
+}

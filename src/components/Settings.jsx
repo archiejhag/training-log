@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import SyncPanel from './SyncPanel';
-import FriendsPanel from './FriendsPanel';
 
 /* Settings: data in/out, cross-device sync, the weekly bar, and theme.
    localStorage is always the working copy; sync (when configured) layers
@@ -20,9 +19,6 @@ export default function Settings({
   onClearAll,
   auth,
   sync,
-  friends,
-  onViewFriend,
-  friendViewError,
   weeklyBar = null,
   onWeeklyBar,
   weekStart = 'monday',
@@ -168,13 +164,6 @@ export default function Settings({
       </section>
 
       <SyncPanel auth={auth} sync={sync} />
-
-      <FriendsPanel
-        auth={auth}
-        friends={friends}
-        onViewFriend={onViewFriend}
-        viewError={friendViewError}
-      />
 
       <section className="card">
         <h2>Your week</h2>
