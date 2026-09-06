@@ -191,12 +191,13 @@ that adds friction to the daily mark is still wrong.
   literal `rgba()` instead of a token, so they showed the chalkboard hue
   on the whiteboard. All swapped to `color-mix(… var(--token) …)` — no
   change in dark, correct in light.
-- **Fix the install splash flash for whiteboard users** `[Low · S]` — the
-  PWA manifest's `background_color` / `theme_color` are hardcoded to the
-  dark slate. Anyone whose saved preference is the light theme sees a
-  flash of dark slate on launch before the page itself paints light.
-  Decide on a real fix (or a deliberate, accepted trade-off) rather than
-  leaving it as an oversight.
+- **Fix the install splash flash for whiteboard users** `[Low · S]` ✅
+  shipped — the pre-paint script now swaps the `theme-color` meta to the
+  light value alongside `data-theme`, so the browser / status-bar chrome
+  no longer flashes dark slate after a light-theme launch. The manifest
+  `background_color` deliberately stays dark: the OS splash draws the app
+  icon on it, and the icon has its own dark ground — a cream splash would
+  just frame a dark icon. That one sub-second beat is accepted.
 - **A view-transition beat** `[Low · S]` — Home, the log screen, and
   Settings currently cut instantly. A short, tasteful transition (still
   behind `prefers-reduced-motion`) would match the motion-craft already
