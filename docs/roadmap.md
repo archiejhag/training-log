@@ -198,10 +198,10 @@ that adds friction to the daily mark is still wrong.
   `background_color` deliberately stays dark: the OS splash draws the app
   icon on it, and the icon has its own dark ground — a cream splash would
   just frame a dark icon. That one sub-second beat is accepted.
-- **A view-transition beat** `[Low · S]` — Home, the log screen, and
-  Settings currently cut instantly. A short, tasteful transition (still
-  behind `prefers-reduced-motion`) would match the motion-craft already
-  spent on the strip.
+- **A view-transition beat** `[Low · S]` ✅ shipped — a `navigate()`
+  helper wraps screen changes in `document.startViewTransition`, giving a
+  0.2s cross-fade with the incoming screen easing up a few pixels. Falls
+  back to an instant cut where the API is missing or Reduce Motion is on.
 - **"Share your week" as a chalk-styled image** `[Med · M]` — render a
   week or month strip to a downloadable image, in the app's own visual
   language. Doubles as a nice feature and as ready-made portfolio /
