@@ -354,7 +354,7 @@
 
 .freeform-input:focus {
   outline: none;
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .footnote {
@@ -453,7 +453,7 @@
 
 .nudge-accept {
   appearance: none;
-  border: 1px solid rgba(201, 154, 74, 0.5);
+  border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent);
   background: var(--panel-selected);
   color: var(--chalk);
   font-family: 'IBM Plex Mono', monospace;
@@ -470,7 +470,7 @@
 
 .nudge-accept:hover {
   transform: translateY(-1px);
-  border-color: rgba(201, 154, 74, 0.8);
+  border-color: color-mix(in srgb, var(--amber) 80%, transparent);
 }
 
 .nudge-later {
@@ -699,13 +699,13 @@
 }
 
 .tier-btn[data-tier='trained'].selected {
-  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.5);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 50%, transparent);
 }
 .tier-btn[data-tier='skipped'].selected {
-  box-shadow: inset 0 0 0 1px rgba(124, 139, 147, 0.6);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--skip) 60%, transparent);
 }
 .tier-btn[data-tier='rest'].selected {
-  box-shadow: inset 0 0 0 1px rgba(143, 160, 137, 0.6);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rest) 60%, transparent);
 }
 
 /* ---- Check-in: skip-reason chips -------------------------------- */
@@ -787,7 +787,7 @@
 
 .reason-text:focus {
   outline: none;
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 /* ---- Check-in: session-type chips (only when Trained) ---------- */
@@ -831,7 +831,7 @@
 
 .type-chip.selected {
   background: var(--panel-selected);
-  border-color: rgba(201, 154, 74, 0.6);
+  border-color: color-mix(in srgb, var(--amber) 60%, transparent);
   color: var(--chalk);
 }
 
@@ -935,7 +935,7 @@
 
 .note-input:focus {
   outline: none;
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .log-prompt-title {
@@ -1138,7 +1138,7 @@ button.week-stat-btn:focus-visible {
 
 .bar-chip.selected {
   background: var(--panel-selected);
-  border-color: rgba(201, 154, 74, 0.6);
+  border-color: color-mix(in srgb, var(--amber) 60%, transparent);
   color: var(--chalk);
 }
 
@@ -1363,7 +1363,7 @@ button.week-stat-btn:focus-visible {
 
 .day-col.is-today .day-label {
   color: var(--chalk);
-  border-color: rgba(201, 154, 74, 0.75);
+  border-color: color-mix(in srgb, var(--amber) 75%, transparent);
 }
 
 /* ---- Board furniture: the chalk rail ------------------------- */
@@ -1544,12 +1544,12 @@ button.week-stat-btn:focus-visible {
 }
 
 .month-cell.is-today {
-  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.75);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 75%, transparent);
 }
 
 .month-cell.is-today.is-selected {
   box-shadow:
-    inset 0 0 0 1px rgba(201, 154, 74, 0.75),
+    inset 0 0 0 1px color-mix(in srgb, var(--amber) 75%, transparent),
     inset 0 0 0 3px var(--panel-raised);
 }
 
@@ -1691,7 +1691,7 @@ button.week-stat-btn:focus-visible {
 }
 
 .season-cell.is-today {
-  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.75);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 75%, transparent);
 }
 
 .season-cell.is-future .season-mark {
@@ -1918,7 +1918,7 @@ button.week-stat-btn:focus-visible {
 }
 
 .perset-in:focus {
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .perset-del {
@@ -2019,7 +2019,7 @@ button.week-stat-btn:focus-visible {
 
 .exercise-name:focus,
 .field input:focus {
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .add-exercise,
@@ -2218,7 +2218,7 @@ button.week-stat-btn:focus-visible {
 
 .preset-name-input:focus {
   outline: none;
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .preset-name-save {
@@ -2327,7 +2327,7 @@ button.week-stat-btn:focus-visible {
 
 .danger-btn {
   appearance: none;
-  border: 1px solid rgba(201, 154, 74, 0.4);
+  border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent);
   background: transparent;
   color: var(--amber);
   font-family: 'IBM Plex Mono', monospace;
@@ -2341,8 +2341,8 @@ button.week-stat-btn:focus-visible {
 }
 
 .danger-btn:hover:not(:disabled) {
-  background: rgba(201, 154, 74, 0.12);
-  border-color: rgba(201, 154, 74, 0.7);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  border-color: color-mix(in srgb, var(--amber) 70%, transparent);
 }
 
 .danger-btn:disabled {
@@ -2385,7 +2385,7 @@ button.week-stat-btn:focus-visible {
 
 .sync-email:focus {
   outline: none;
-  border-color: rgba(201, 154, 74, 0.55);
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
 }
 
 .sync-status {
