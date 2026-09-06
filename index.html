@@ -16,11 +16,19 @@
     <meta name="apple-mobile-web-app-title" content="Training Log" />
     <title>Training Log</title>
     <script>
-      /* set the saved theme before first paint so there's no flash */
+      /* Apply the saved theme before first paint: the data-theme attribute
+         for the page, and the theme-color meta so the browser / status-bar
+         chrome doesn't flash the dark slate at a light-theme user on launch.
+         The PWA splash itself is drawn by the OS from the manifest's
+         background_color, which stays dark on purpose — it matches the app
+         icon's own dark ground. That is one brief, deliberate beat; this
+         kills the flash on everything the page can actually control. */
       try {
         var s = JSON.parse(localStorage.getItem('training-log/v1'));
         if (s && s.prefs && s.prefs.theme === 'light') {
           document.documentElement.setAttribute('data-theme', 'light');
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', '#ecebe3');
         }
       } catch (e) {}
     </script>
