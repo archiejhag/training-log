@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { dayLetter, weekdayName, weekRangeLabel } from '../lib/date';
+import { buildWeekCardSVG, svgToPngBlob, shareOrDownload } from '../lib/shareCard';
 import HistoryToggle from './HistoryToggle';
 
 /* The "This week" card. Seven equal chalk strokes — colour tells you the
@@ -38,6 +39,30 @@ export default function WeeklyView({
   const marked = week.filter((key) => getDay(key).tier).length;
   const trained = week.filter((key) => getDay(key).tier === 'trained').length;
   const stripRef = useRef(null);
+  const [sharing, setSharing] = useState(false);
+
+  // Render the current week to a chalk-styled PNG and hand it to the Web
+  // Share sheet (mobile) or a download (desktop). Any failure is quiet —
+  // nothing was changed, and there's nothing useful to say about it.
+  const handleShare = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      const svg = buildWeekCardSVG({
+        dayTiers: week.map((k) => getDay(k).tier ?? 'none'),
+        letters: week.map((k) => dayLetter(k)),
+        title: weekLabel(weekOffset, week),
+        countMain: bar != null ? `${trained} / ${bar}` : `${marked} / 7`,
+        countSub: bar != null ? `${marked} / 7 marked` : `${marked} marked`,
+      });
+      const blob = await svgToPngBlob(svg);
+      await shareOrDownload(blob, `slate-${week[0]}.png`);
+    } catch {
+      // no-op
+    } finally {
+      setSharing(false);
+    }
+  };
 
   // The eraser only works on a marked day that's actually on screen.
   const canErase = week.includes(selectedDate) && getDay(selectedDate).tier != null;
@@ -221,6 +246,15 @@ export default function WeeklyView({
             ? 'Tap any day to fill it in. A blank week is just a blank week — nothing to make up.'
             : 'Tap any day to fill it in. Every mark stands on its own.'}
       </p>
+
+      <button
+        type="button"
+        className="share-week"
+        onClick={handleShare}
+        disabled={sharing}
+      >
+        {sharing ? 'Preparing…' : 'Share this week'}
+      </button>
     </section>
   );
 }

@@ -400,6 +400,40 @@
   font-weight: 500;
 }
 
+.share-week {
+  display: block;
+  margin: 14px auto 0;
+  appearance: none;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.share-week:hover:not(:disabled) {
+  color: var(--chalk);
+  border-color: var(--chalk-dim);
+}
+
+.share-week:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.share-week:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
 .hairline-rule {
   height: 1px;
   background: var(--hairline);
