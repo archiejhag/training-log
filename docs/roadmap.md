@@ -184,11 +184,13 @@ that adds friction to the daily mark is still wrong.
   wiped sideways when cleared; the same tier-signature diff WeeklyView
   uses, so paging months doesn't trigger it and `prefers-reduced-motion`
   zeroes it.
-- **Whiteboard-theme audit** `[Med · S]` — everything built after the light
-  theme shipped (per-set detail, freeform mode, the sync panel, the newer
-  Settings cards, the busy-stretch and skip-reason nudges, the term view)
-  has mostly only been checked in the dark chalkboard theme. Go through
-  each in whiteboard mode and fix whatever quietly assumed dark.
+- **Whiteboard-theme audit** `[Med · S]` ✅ shipped — walked every
+  post-light-theme surface in whiteboard mode. The surfaces themselves
+  rendered fine; the one systematic bug was ~20 borders, focus rings and
+  selection rings that hardcoded the dark amber / skip / rest colours as
+  literal `rgba()` instead of a token, so they showed the chalkboard hue
+  on the whiteboard. All swapped to `color-mix(… var(--token) …)` — no
+  change in dark, correct in light.
 - **Fix the install splash flash for whiteboard users** `[Low · S]` — the
   PWA manifest's `background_color` / `theme_color` are hardcoded to the
   dark slate. Anyone whose saved preference is the light theme sees a
