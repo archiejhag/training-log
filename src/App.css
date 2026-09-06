@@ -160,14 +160,92 @@
     min-height: 100dvh;
     border-radius: 0;
     box-shadow: none;
+    display: flex;
+    flex-direction: column;
   }
 
   .app {
+    flex: 1;
     padding-top: calc(26px + env(safe-area-inset-top));
     padding-right: calc(20px + env(safe-area-inset-right));
     padding-bottom: calc(24px + env(safe-area-inset-bottom));
     padding-left: calc(20px + env(safe-area-inset-left));
   }
+}
+
+/* ---- Bottom nav ---------------------------------------------------- */
+
+/* Sticks to the bottom of the frame. Bleeds past .app's padding to the
+   phone edges; re-adds a safe-area gap of its own. */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  margin: 22px -22px -26px;
+  padding: 8px 4px 10px;
+  background: var(--bg);
+  border-top: 1px solid var(--hairline);
+}
+
+@media (max-width: 520px) {
+  .bottom-nav {
+    margin-left: calc(-20px - env(safe-area-inset-left));
+    margin-right: calc(-20px - env(safe-area-inset-right));
+    margin-bottom: calc(-24px - env(safe-area-inset-bottom));
+    padding-left: calc(4px + env(safe-area-inset-left));
+    padding-right: calc(4px + env(safe-area-inset-right));
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
+.nav-tab {
+  position: relative;
+  flex: 1;
+  appearance: none;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 2px 6px;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+/* a short chalk mark over the active tab, sitting on the nav's top line */
+.nav-tab.is-active::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--amber);
+}
+
+.nav-tab:hover {
+  color: var(--chalk);
+}
+
+.nav-tab.is-active {
+  color: var(--chalk);
+}
+
+.nav-tab.is-active svg {
+  color: var(--amber);
+}
+
+.nav-tab:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+  border-radius: 4px;
 }
 
 /* ---- Shared typography --------------------------------------------- */

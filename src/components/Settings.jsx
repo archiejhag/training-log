@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import SyncPanel from './SyncPanel';
 
 /* Settings: data in/out, cross-device sync, the weekly bar, and theme.
@@ -25,17 +25,10 @@ export default function Settings({
   onWeekStart,
   theme,
   onTheme,
-  onBack,
 }) {
   const fileRef = useRef(null);
-  const backRef = useRef(null);
   const [msg, setMsg] = useState(null); // { kind: 'ok' | 'err', text }
   const [clearing, setClearing] = useState(false);
-
-  // Land keyboard focus somewhere sensible on this screen.
-  useEffect(() => {
-    backRef.current?.focus();
-  }, []);
 
   const dayCount = countDays(allData);
 
@@ -102,10 +95,6 @@ export default function Settings({
 
   return (
     <div className="settings-screen">
-      <button type="button" className="back-btn" ref={backRef} onClick={onBack}>
-        &larr; Back
-      </button>
-
       <p className="eyebrow">Slate</p>
       <h1>Settings</h1>
 

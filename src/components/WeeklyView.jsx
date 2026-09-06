@@ -35,6 +35,7 @@ export default function WeeklyView({
   onEditBar,
   historyMode,
   onHistoryMode,
+  showToggle = true,
 }) {
   const marked = week.filter((key) => getDay(key).tier).length;
   const trained = week.filter((key) => getDay(key).tier === 'trained').length;
@@ -138,9 +139,11 @@ export default function WeeklyView({
 
   return (
     <section className="card">
-      <div className="hist-top">
-        <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
-      </div>
+      {showToggle && (
+        <div className="hist-top">
+          <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
+        </div>
+      )}
 
       <div className="week-header">
         <div className="week-nav">

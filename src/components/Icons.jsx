@@ -1,5 +1,58 @@
-/* Small line icons for the top-bar tabs. currentColor throughout, so they
-   pick up whatever the button's own color (dim / hover / active) is. */
+/* Small line icons for the header bell and the bottom nav. currentColor
+   throughout, so they pick up whatever the button's own color (dim /
+   hover / active) is. */
+
+function Icon({ children, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      {children}
+    </svg>
+  );
+}
+
+/* the daily mark: a board with a single chalk stroke on it */
+export function TodayIcon(props) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+      <path d="M8 12h8" />
+    </Icon>
+  );
+}
+
+/* month / term: a small grid */
+export function HistoryIcon(props) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" />
+      <path d="M3.5 9h17M9 9v11.5M15 9v11.5" />
+    </Icon>
+  );
+}
+
+/* settings: three sliders */
+export function SettingsIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+      <circle cx="9" cy="7" r="2" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="12" r="2" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="17" r="2" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
 
 export function FriendsIcon(props) {
   return (

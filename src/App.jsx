@@ -31,7 +31,9 @@ import FriendLog from './components/FriendLog';
 import FriendsScreen from './components/FriendsScreen';
 import UsernameSetup from './components/UsernameSetup';
 import NotificationsScreen from './components/NotificationsScreen';
-import { FriendsIcon, BellIcon } from './components/Icons';
+import HistoryToggle from './components/HistoryToggle';
+import BottomNav from './components/BottomNav';
+import { BellIcon } from './components/Icons';
 
 /* App owns:
    1. which view is on screen ('home' or the training-log detail screen)
@@ -63,7 +65,10 @@ export default function App() {
   const friends = useFriends(auth.user);
   const profile = useProfile(auth.user);
 
-  const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friends' | 'notifications' | 'friend'
+  const [view, setView] = useState('home');
+  // Tabs sit behind the bottom nav; the rest are overlays (their own Back).
+  // 'home' | 'history' | 'friends' | 'settings' | 'notifications' | 'log' | 'friend'
+  const TAB_VIEWS = ['home', 'history', 'friends', 'settings'];
 
   // Screen-to-screen navigation gets a short cross-fade via the View
   // Transitions API — where the browser supports it and motion isn't
@@ -80,7 +85,7 @@ export default function App() {
   };
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
-  const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
+  const [historyMode, setHistoryMode] = useState('month'); // 'month' | 'season' — the History tab
   const [friendView, setFriendView] = useState(null); // { username, days } | null
   const [friendViewError, setFriendViewError] = useState(null);
   const [friendViewOrigin, setFriendViewOrigin] = useState('friends'); // where "Back" from a friend's log returns to
@@ -286,6 +291,9 @@ export default function App() {
     setPref('catchUpDismissedFor', yesterday);
   };
 
+  const usernameGate = auth.status === 'in' && profile.status === 'needed';
+  const onTab = TAB_VIEWS.includes(view);
+
   return (
     <div className="phone">
       {/* Defined once, referenced by every .stroke / .mark via
@@ -313,21 +321,13 @@ export default function App() {
       </svg>
 
       <main className="app">
-        {auth.status === 'in' && profile.status === 'needed' ? (
+        {usernameGate ? (
           <UsernameSetup profile={profile} onSignOut={auth.signOut} />
-        ) : view === 'home' ? (
+        ) : (
           <>
-            <div className="app-top">
-              <p className="eyebrow">Slate</p>
-              <div className="top-actions">
-                <button
-                  type="button"
-                  className="icon-btn"
-                  aria-label="Friends"
-                  onClick={() => navigate('friends')}
-                >
-                  <FriendsIcon />
-                </button>
+            {onTab && (
+              <div className="app-top">
+                <p className="eyebrow">Slate</p>
                 <button
                   type="button"
                   className="icon-btn"
@@ -345,161 +345,171 @@ export default function App() {
                     </span>
                   )}
                 </button>
-                <button
-                  type="button"
-                  className="settings-link"
-                  onClick={() => navigate('settings')}
-                >
-                  Settings
-                </button>
               </div>
-            </div>
-            <div className="day-heading">
-              <h1>{weekdayName(selectedDate)}</h1>
-              {!isToday && (
-                <button type="button" className="back-to-today" onClick={goToToday}>
-                  Back to today
-                </button>
-              )}
-            </div>
-
-            {showCatchUp && (
-              <CatchUp
-                dateLabel={weekdayName(yesterday)}
-                onMark={(tier) => markYesterday(tier)}
-                onSkip={(reason) => markYesterday('skipped', reason)}
-                onDismiss={() => setPref('catchUpDismissedFor', yesterday)}
-              />
             )}
 
-            {busy.offer && (
-              <BusyNudge
-                skips={busy.skips}
-                suggestedBar={busy.suggestedBar}
-                onAccept={acceptBusyNudge}
-                onDismiss={dismissBusyNudge}
+            {view === 'home' ? (
+              <>
+                <div className="day-heading">
+                  <h1>{weekdayName(selectedDate)}</h1>
+                  {!isToday && (
+                    <button type="button" className="back-to-today" onClick={goToToday}>
+                      Back to today
+                    </button>
+                  )}
+                </div>
+
+                {showCatchUp && (
+                  <CatchUp
+                    dateLabel={weekdayName(yesterday)}
+                    onMark={(tier) => markYesterday(tier)}
+                    onSkip={(reason) => markYesterday('skipped', reason)}
+                    onDismiss={() => setPref('catchUpDismissedFor', yesterday)}
+                  />
+                )}
+
+                {busy.offer && (
+                  <BusyNudge
+                    skips={busy.skips}
+                    suggestedBar={busy.suggestedBar}
+                    onAccept={acceptBusyNudge}
+                    onDismiss={dismissBusyNudge}
+                  />
+                )}
+
+                {showReasonNote && (
+                  <ReasonPatternNote
+                    reason={reasonNote.reason}
+                    count={reasonNote.count}
+                    onDismiss={dismissReasonNote}
+                  />
+                )}
+
+                <FriendNotifications
+                  friendships={friends.friendships}
+                  friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
+                  onRespond={friends.respond}
+                  onViewFriend={openFriendLog}
+                  onDismissAccepted={dismissAcceptedNotice}
+                />
+
+                <CheckIn
+                  day={day}
+                  isToday={isToday}
+                  reEntry={reEntry}
+                  dateLabel={weekdayName(selectedDate)}
+                  onTier={(tier) => setTier(selectedDate, tier)}
+                  onReason={(reason) => setReason(selectedDate, reason)}
+                  onReasonText={(text) => setReasonText(selectedDate, text)}
+                  onType={(type) => setType(selectedDate, type)}
+                  onNote={(note) => setNote(selectedDate, note)}
+                  onOpenLog={() => navigate('log')}
+                />
+
+                <WeeklyView
+                  week={week}
+                  weekOffset={weekOffset}
+                  onWeekChange={changeWeek}
+                  getDay={getDay}
+                  today={today}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  onErase={() => setTier(selectedDate, null)}
+                  bar={weeklyBar}
+                  onEditBar={() => navigate('settings')}
+                  showToggle={false}
+                />
+              </>
+            ) : view === 'history' ? (
+              <>
+                <div className="day-heading">
+                  <h1>History</h1>
+                </div>
+                <div className="hist-top">
+                  <HistoryToggle
+                    mode={historyMode === 'season' ? 'season' : 'month'}
+                    modes={['month', 'season']}
+                    onMode={setHistoryMode}
+                  />
+                </div>
+                {historyMode === 'season' ? (
+                  <SeasonView
+                    getDay={getDay}
+                    today={today}
+                    weekStart={weekStart}
+                    showToggle={false}
+                  />
+                ) : (
+                  <MonthView
+                    getDay={getDay}
+                    today={today}
+                    selectedDate={selectedDate}
+                    onSelectDate={(k) => {
+                      setSelectedDate(k);
+                      navigate('home');
+                    }}
+                    weekStart={weekStart}
+                    showToggle={false}
+                  />
+                )}
+              </>
+            ) : view === 'friends' ? (
+              <FriendsScreen
+                auth={auth}
+                friends={friends}
+                onViewFriend={openFriendLog}
+                friendViewError={friendViewError}
+                showSkipped={prefs.friendShowSkipped === true}
+                onShowSkippedChange={(v) => setPref('friendShowSkipped', v)}
               />
-            )}
-
-            {showReasonNote && (
-              <ReasonPatternNote
-                reason={reasonNote.reason}
-                count={reasonNote.count}
-                onDismiss={dismissReasonNote}
-              />
-            )}
-
-            <FriendNotifications
-              friendships={friends.friendships}
-              friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
-              onRespond={friends.respond}
-              onViewFriend={openFriendLog}
-              onDismissAccepted={dismissAcceptedNotice}
-            />
-
-            <CheckIn
-              day={day}
-              isToday={isToday}
-              reEntry={reEntry}
-              dateLabel={weekdayName(selectedDate)}
-              onTier={(tier) => setTier(selectedDate, tier)}
-              onReason={(reason) => setReason(selectedDate, reason)}
-              onReasonText={(text) => setReasonText(selectedDate, text)}
-              onType={(type) => setType(selectedDate, type)}
-              onNote={(note) => setNote(selectedDate, note)}
-              onOpenLog={() => navigate('log')}
-            />
-
-            {historyMode === 'week' ? (
-              <WeeklyView
-                week={week}
-                weekOffset={weekOffset}
-                onWeekChange={changeWeek}
-                getDay={getDay}
-                today={today}
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
-                onErase={() => setTier(selectedDate, null)}
-                bar={weeklyBar}
-                onEditBar={() => navigate('settings')}
-                historyMode={historyMode}
-                onHistoryMode={setHistoryMode}
-              />
-            ) : historyMode === 'month' ? (
-              <MonthView
-                getDay={getDay}
-                today={today}
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
+            ) : view === 'settings' ? (
+              <Settings
+                allData={allData}
+                onImport={replaceAll}
+                onClearAll={clearAllData}
+                auth={auth}
+                sync={sync}
+                weeklyBar={weeklyBar}
+                onWeeklyBar={(n) => setPref('weeklyBar', n)}
                 weekStart={weekStart}
-                historyMode={historyMode}
-                onHistoryMode={setHistoryMode}
+                onWeekStart={(w) => setPref('weekStart', w)}
+                theme={prefs.theme === 'light' ? 'light' : 'dark'}
+                onTheme={(t) => setPref('theme', t)}
+              />
+            ) : view === 'notifications' ? (
+              <NotificationsScreen
+                friendships={friends.friendships}
+                friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
+                onRespond={friends.respond}
+                onViewFriend={openFriendLog}
+                onDismissAccepted={dismissAcceptedNotice}
+                onBack={() => navigate('home')}
+              />
+            ) : view === 'friend' && friendView ? (
+              <FriendLog
+                friend={friendView}
+                today={today}
+                weekStart={weekStart}
+                onBack={() => navigate(friendViewOrigin)}
               />
             ) : (
-              <SeasonView
-                getDay={getDay}
-                today={today}
-                weekStart={weekStart}
-                historyMode={historyMode}
-                onHistoryMode={setHistoryMode}
+              <TrainingLog
+                dateLabel={weekdayName(selectedDate)}
+                exercises={day.exercises}
+                freeform={day.freeform ?? ''}
+                suggestions={exerciseNames}
+                fillOptions={fillOptions}
+                presets={presets}
+                onSavePreset={savePreset}
+                onDeletePreset={deletePreset}
+                onChange={(exercises) => setExercises(selectedDate, exercises)}
+                onFreeformChange={(text) => setFreeform(selectedDate, text)}
+                onBack={() => navigate('home')}
               />
             )}
+
+            {onTab && <BottomNav active={view} onNavigate={navigate} />}
           </>
-        ) : view === 'settings' ? (
-          <Settings
-            allData={allData}
-            onImport={replaceAll}
-            onClearAll={clearAllData}
-            auth={auth}
-            sync={sync}
-            weeklyBar={weeklyBar}
-            onWeeklyBar={(n) => setPref('weeklyBar', n)}
-            weekStart={weekStart}
-            onWeekStart={(w) => setPref('weekStart', w)}
-            theme={prefs.theme === 'light' ? 'light' : 'dark'}
-            onTheme={(t) => setPref('theme', t)}
-            onBack={() => navigate('home')}
-          />
-        ) : view === 'friends' ? (
-          <FriendsScreen
-            auth={auth}
-            friends={friends}
-            onViewFriend={openFriendLog}
-            friendViewError={friendViewError}
-            showSkipped={prefs.friendShowSkipped === true}
-            onShowSkippedChange={(v) => setPref('friendShowSkipped', v)}
-            onBack={() => navigate('home')}
-          />
-        ) : view === 'notifications' ? (
-          <NotificationsScreen
-            friendships={friends.friendships}
-            friendAcceptedSeenAt={prefs.friendAcceptedSeenAt}
-            onRespond={friends.respond}
-            onViewFriend={openFriendLog}
-            onDismissAccepted={dismissAcceptedNotice}
-            onBack={() => navigate('home')}
-          />
-        ) : view === 'friend' && friendView ? (
-          <FriendLog
-            friend={friendView}
-            today={today}
-            weekStart={weekStart}
-            onBack={() => navigate(friendViewOrigin)}
-          />
-        ) : (
-          <TrainingLog
-            dateLabel={weekdayName(selectedDate)}
-            exercises={day.exercises}
-            freeform={day.freeform ?? ''}
-            suggestions={exerciseNames}
-            fillOptions={fillOptions}
-            presets={presets}
-            onSavePreset={savePreset}
-            onDeletePreset={deletePreset}
-            onChange={(exercises) => setExercises(selectedDate, exercises)}
-            onFreeformChange={(text) => setFreeform(selectedDate, text)}
-            onBack={() => navigate('home')}
-          />
         )}
       </main>
     </div>

@@ -13,17 +13,12 @@ export default function FriendsScreen({
   friendViewError,
   showSkipped,
   onShowSkippedChange,
-  onBack,
 }) {
   const { syncAvailable, status: authStatus } = auth;
   const signedIn = syncAvailable && authStatus === 'in';
 
   return (
     <div className="settings-screen">
-      <button type="button" className="back-btn" onClick={onBack}>
-        &larr; Back
-      </button>
-
       <p className="eyebrow">Slate</p>
       <h1>Friends</h1>
 

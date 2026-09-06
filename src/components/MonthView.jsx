@@ -15,6 +15,7 @@ export default function MonthView({
   weekStart = 'monday',
   historyMode,
   onHistoryMode,
+  showToggle = true,
 }) {
   const [offset, setOffset] = useState(0); // 0 = this month, negative = past
   const gridRef = useRef(null);
@@ -96,9 +97,11 @@ export default function MonthView({
 
   return (
     <section className="card">
-      <div className="hist-top">
-        <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
-      </div>
+      {showToggle && (
+        <div className="hist-top">
+          <HistoryToggle mode={historyMode} onMode={onHistoryMode} />
+        </div>
+      )}
 
       <div className="week-header">
         <div className="week-nav">
