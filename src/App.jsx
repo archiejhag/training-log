@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import './App.css';
 import { useTrainingLog } from './hooks/useTrainingLog';
 import { useAuth } from './hooks/useAuth';
@@ -63,6 +64,20 @@ export default function App() {
   const profile = useProfile(auth.user);
 
   const [view, setView] = useState('home'); // 'home' | 'log' | 'settings' | 'friends' | 'notifications' | 'friend'
+
+  // Screen-to-screen navigation gets a short cross-fade via the View
+  // Transitions API — where the browser supports it and motion isn't
+  // reduced. Otherwise it's a plain setView, an instant cut, exactly as
+  // before. flushSync makes React apply the state change inside the
+  // transition callback so the API can snapshot the new screen.
+  const navigate = (next) => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !document.startViewTransition) {
+      setView(next);
+      return;
+    }
+    document.startViewTransition(() => flushSync(() => setView(next)));
+  };
   const [selectedDate, setSelectedDate] = useState(today);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, negative = past
   const [historyMode, setHistoryMode] = useState('week'); // 'week' | 'month' | 'season'
@@ -81,7 +96,7 @@ export default function App() {
       const days = await getFriendDays(friendship.friend_id);
       setFriendView({ username: friendship.friend_username, days });
       setFriendViewOrigin(view === 'notifications' ? 'notifications' : 'friends');
-      setView('friend');
+      navigate('friend');
     } catch (e) {
       setFriendViewError(e.message ?? "Could not open that friend's log");
     }
@@ -309,7 +324,7 @@ export default function App() {
                   type="button"
                   className="icon-btn"
                   aria-label="Friends"
-                  onClick={() => setView('friends')}
+                  onClick={() => navigate('friends')}
                 >
                   <FriendsIcon />
                 </button>
@@ -321,7 +336,7 @@ export default function App() {
                       ? `Notifications (${notificationCount} unread)`
                       : 'Notifications'
                   }
-                  onClick={() => setView('notifications')}
+                  onClick={() => navigate('notifications')}
                 >
                   <BellIcon />
                   {notificationCount > 0 && (
@@ -333,7 +348,7 @@ export default function App() {
                 <button
                   type="button"
                   className="settings-link"
-                  onClick={() => setView('settings')}
+                  onClick={() => navigate('settings')}
                 >
                   Settings
                 </button>
@@ -392,7 +407,7 @@ export default function App() {
               onReasonText={(text) => setReasonText(selectedDate, text)}
               onType={(type) => setType(selectedDate, type)}
               onNote={(note) => setNote(selectedDate, note)}
-              onOpenLog={() => setView('log')}
+              onOpenLog={() => navigate('log')}
             />
 
             {historyMode === 'week' ? (
@@ -406,7 +421,7 @@ export default function App() {
                 onSelectDate={setSelectedDate}
                 onErase={() => setTier(selectedDate, null)}
                 bar={weeklyBar}
-                onEditBar={() => setView('settings')}
+                onEditBar={() => navigate('settings')}
                 historyMode={historyMode}
                 onHistoryMode={setHistoryMode}
               />
@@ -443,7 +458,7 @@ export default function App() {
             onWeekStart={(w) => setPref('weekStart', w)}
             theme={prefs.theme === 'light' ? 'light' : 'dark'}
             onTheme={(t) => setPref('theme', t)}
-            onBack={() => setView('home')}
+            onBack={() => navigate('home')}
           />
         ) : view === 'friends' ? (
           <FriendsScreen
@@ -453,7 +468,7 @@ export default function App() {
             friendViewError={friendViewError}
             showSkipped={prefs.friendShowSkipped === true}
             onShowSkippedChange={(v) => setPref('friendShowSkipped', v)}
-            onBack={() => setView('home')}
+            onBack={() => navigate('home')}
           />
         ) : view === 'notifications' ? (
           <NotificationsScreen
@@ -462,14 +477,14 @@ export default function App() {
             onRespond={friends.respond}
             onViewFriend={openFriendLog}
             onDismissAccepted={dismissAcceptedNotice}
-            onBack={() => setView('home')}
+            onBack={() => navigate('home')}
           />
         ) : view === 'friend' && friendView ? (
           <FriendLog
             friend={friendView}
             today={today}
             weekStart={weekStart}
-            onBack={() => setView(friendViewOrigin)}
+            onBack={() => navigate(friendViewOrigin)}
           />
         ) : (
           <TrainingLog
@@ -483,7 +498,7 @@ export default function App() {
             onDeletePreset={deletePreset}
             onChange={(exercises) => setExercises(selectedDate, exercises)}
             onFreeformChange={(text) => setFreeform(selectedDate, text)}
-            onBack={() => setView('home')}
+            onBack={() => navigate('home')}
           />
         )}
       </main>

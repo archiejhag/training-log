@@ -77,6 +77,37 @@
   }
 }
 
+/* Screen-to-screen: a short cross-fade, with the incoming screen easing up
+   a few pixels. App.jsx only calls startViewTransition when motion isn't
+   reduced, so this never runs under Reduce Motion; the media query is a
+   second guard for browsers that animate view transitions regardless. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+  }
+  ::view-transition-old(root) {
+    animation-name: vt-out;
+  }
+  ::view-transition-new(root) {
+    animation-name: vt-in;
+  }
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 /* holds the SVG filter defs — kept in the DOM (not display:none, which
    stops Firefox applying the filter) but out of the layout */
 .svg-defs {
