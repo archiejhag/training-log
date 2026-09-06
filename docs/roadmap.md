@@ -8,14 +8,13 @@ make it honest.
 > A styled version of this roadmap lives here:
 > <https://claude.ai/code/artifact/94b7d7fe-5a1e-41e1-bc69-27ce73f9325a>
 
-Where the app is today: Phases 0 through 5 below are all shipped — the core
-loop, the chalk visual identity, structured logging, the adaptive layer
-(bar, busy-stretch detection, gaps-are-normal view), optional cloud sync via
-Supabase with CI and a performance budget behind it, and Friends (add by
+Where the app is today: every phase below has shipped — the core loop, the
+chalk visual identity, structured logging, the adaptive layer (bar,
+busy-stretch detection, gaps-are-normal view), optional cloud sync via
+Supabase with CI and a performance budget behind it, Friends (add by
 username, in-app notifications, visibility controls over what a friend can
-see). **Phase 6** is what's left — mostly finishing the visual craft in
-corners the faster-moving earlier phases didn't get to, not new product
-surface.
+see), and the Phase 6 aesthetic pass. What's left is the loose "also worth
+considering" list below, not a numbered phase.
 
 ---
 
@@ -171,13 +170,13 @@ friend-related happens.
   email-based `request_friend` outright; requests, the friends list, and
   notifications all show a username now, not an email.
 
-## Phase 6 — Aesthetic polish
+## Phase 6 — Aesthetic polish ✅ shipped
 
 Mostly finishing, not adding. Phases 2–4 moved fast and shipped real
-functionality; a few corners have plainer styling than the weekly strip's
-original chalk treatment got, or were only ever checked in one theme. Run
-these through the same four questions as anything else — a visual change
-that adds friction to the daily mark is still wrong.
+functionality; a few corners had plainer styling than the weekly strip's
+original chalk treatment got, or were only ever checked in one theme. All
+five went through the same four questions as anything else — a visual
+change that adds friction to the daily mark is still wrong.
 
 - **Draw-on motion for the Month view** `[Med · M]` ✅ shipped — a month
   cell whose tier just changed is drawn on with an elastic settle, or
@@ -202,10 +201,13 @@ that adds friction to the daily mark is still wrong.
   helper wraps screen changes in `document.startViewTransition`, giving a
   0.2s cross-fade with the incoming screen easing up a few pixels. Falls
   back to an instant cut where the API is missing or Reduce Motion is on.
-- **"Share your week" as a chalk-styled image** `[Med · M]` — render a
-  week or month strip to a downloadable image, in the app's own visual
-  language. Doubles as a nice feature and as ready-made portfolio /
-  screenshot material.
+- **"Share your week" as a chalk-styled image** `[Med · M]` ✅ shipped — a
+  "Share this week" button under the weekly card renders the current week
+  as a 1080×1080 PNG in the app's own language: the dark board, the seven
+  strokes with their tier textures run through the same `#chalk-edge`
+  turbulence filter, the date label and the count. Built as a
+  self-contained SVG string, rasterised on a canvas, then handed to the
+  Web Share sheet where file sharing is supported or downloaded otherwise.
 
 ### Also worth considering — functional, not aesthetic
 
