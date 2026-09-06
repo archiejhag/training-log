@@ -1,4 +1,4 @@
-# Training Log — where it goes next
+# Slate — where it goes next
 
 A phased plan for evolving the app. This is a **sequence**, not a backlog: it
 hardens the core loop before widening the surface, and it puts the feature that

@@ -119,7 +119,7 @@ export default function TrainingLog({
         &larr; Back
       </button>
 
-      <p className="eyebrow">Training Log</p>
+      <p className="eyebrow">Slate</p>
       <h1>{dateLabel}</h1>
 
       <section className="card">

@@ -23,7 +23,7 @@ export default function UsernameSetup({ profile, onSignOut }) {
 
   return (
     <div className="settings-screen">
-      <p className="eyebrow">Training Log</p>
+      <p className="eyebrow">Slate</p>
       <h1>Choose a username</h1>
 
       <section className="card">

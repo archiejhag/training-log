@@ -24,7 +24,7 @@ export default function FriendsScreen({
         &larr; Back
       </button>
 
-      <p className="eyebrow">Training Log</p>
+      <p className="eyebrow">Slate</p>
       <h1>Friends</h1>
 
       {signedIn ? (

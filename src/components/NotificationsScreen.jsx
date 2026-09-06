@@ -18,7 +18,7 @@ export default function NotificationsScreen({
         &larr; Back
       </button>
 
-      <p className="eyebrow">Training Log</p>
+      <p className="eyebrow">Slate</p>
       <h1>Notifications</h1>
 
       <FriendNotifications

@@ -45,7 +45,7 @@ export default function Settings({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `training-log-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `slate-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -63,7 +63,7 @@ export default function Settings({
       return;
     }
     if (!parsed || typeof parsed !== 'object' || typeof parsed.days !== 'object') {
-      setMsg({ kind: 'err', text: "That doesn't look like a Training Log backup." });
+      setMsg({ kind: 'err', text: "That doesn't look like a Slate backup." });
       return;
     }
 
@@ -106,7 +106,7 @@ export default function Settings({
         &larr; Back
       </button>
 
-      <p className="eyebrow">Training Log</p>
+      <p className="eyebrow">Slate</p>
       <h1>Settings</h1>
 
       <section className="card">

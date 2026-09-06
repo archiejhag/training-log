@@ -1,9 +1,9 @@
-# Case study: Training Log
+# Case study: Slate
 
 **Live app:** <https://training-log-roan.vercel.app>
 **Source:** <https://github.com/archiejhag/training-log>
 
-I built Training Log by myself. It's a habit-tracking app for the gym. I
+I built Slate by myself. It's a habit-tracking app for the gym. I
 designed it, built it, deployed it, and kept improving it over 46 commits.
 This page is about how I built it, not what it does: the tools I used and
 why I picked them.

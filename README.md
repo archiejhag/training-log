@@ -1,9 +1,9 @@
-# Training Log
+# Slate
 
 [![CI](https://github.com/archiejhag/training-log/actions/workflows/ci.yml/badge.svg)](https://github.com/archiejhag/training-log/actions/workflows/ci.yml)
 
-A training habit-tracker built for real-life inconsistency — three honest daily
-states, no streaks, no guilt dashboards.
+Slate is a training habit-tracker built for real-life inconsistency — three
+honest daily states, no streaks, no guilt dashboards. (Wipe it, start again.)
 
 **Live demo:** <https://training-log-roan.vercel.app> · **Roadmap:** [`docs/roadmap.md`](docs/roadmap.md) · **Case study:** [`docs/case-study.md`](docs/case-study.md)
 
@@ -35,7 +35,7 @@ Working now:
 
 - Daily check-in (Trained / Skipped / Rest) with optional skip reason
 - Weekly view — seven equal chalk strokes, colour by state, "X / 7 marked"
-- Optional training-log screen: log exercises (name / sets / reps / weight) only
+- Optional exercise-log screen: log exercises (name / sets / reps / weight) only
   when Trained, nothing required, blank rows discarded on exit
 - `localStorage` persistence (survives refresh)
 

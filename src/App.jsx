@@ -318,7 +318,7 @@ export default function App() {
         ) : view === 'home' ? (
           <>
             <div className="app-top">
-              <p className="eyebrow">Training Log</p>
+              <p className="eyebrow">Slate</p>
               <div className="top-actions">
                 <button
                   type="button"

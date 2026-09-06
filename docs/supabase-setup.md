@@ -1,13 +1,13 @@
 # Supabase setup
 
-Cloud sync is optional. With no keys set, Training Log runs entirely on
+Cloud sync is optional. With no keys set, Slate runs entirely on
 `localStorage` — no account, no network. These steps turn on cross-device
 sync.
 
 ## 1. Create the project
 
 1. <https://supabase.com/dashboard> → **New project**.
-2. Name it `training-log`, pick a region near you, set a database password
+2. Name it `slate`, pick a region near you, set a database password
    (you won't need it day-to-day — save it somewhere anyway).
 3. Wait for it to finish provisioning (~2 min).
 
