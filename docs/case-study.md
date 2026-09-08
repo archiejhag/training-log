@@ -35,6 +35,10 @@ why I picked them.
   automated checks (tests, code-quality checks, and a performance check)
   every time I push, so I find out straight away if something's broken
   instead of finding out later.
+- **Jira**: I use a Kanban board here to keep track of what's next — ideas,
+  features to build, bugs to fix — instead of holding it all in my head or
+  in a scratch file. Each card moves from "to do" to "in progress" to
+  "done" as I work through it.
 
 ## A few things I'm proud of
 
